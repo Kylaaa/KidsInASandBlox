@@ -1,0 +1,6 @@
+{
+	"name" : "TwitchBloxPlugin",
+	"tree" : {
+		"$path" : "src",
+	}
+}

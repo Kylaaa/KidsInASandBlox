@@ -1,0 +1,1 @@
+rojo build --output ".\bin\TwitchBloxPlugin.rbxm" "default.project.json"
