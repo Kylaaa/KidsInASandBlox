@@ -1,33 +1,44 @@
-local StudioService = game:GetService("StudioService")
+local pluginRoot = script.Parent
+
+local LibsFolder = pluginRoot.Libs
+local Roact = require(LibsFolder.Roact)
+
+local UIFolder = pluginRoot.UI
+local MainUI = require(UIFolder.MainUI)
+
+local ManagersFolder = pluginRoot.ManagersFolder
+local SingletonManager = require(ManagersFolder.SingletonManager)
+
 
 plugin.Name = "TwitchBlox"
 
-plugin.Unloading:connect(function()
-	
-end)
---[[
-local info = DockWidgetPluginGuiInfo.new(
+-- set up our dependency tree for all of our managers
+local sm = SingletonManager.new()
+sm:registerSingleton(ManagersFolder.NetworkingManager, {})
+sm:initialize()
+
+self.info = DockWidgetPluginGuiInfo.new(
 	Enum.InitialDockState.Float,
-	true, -- Enabled
+	false, -- Enabled
 	true, -- disregardPreviousState
 	300, -- X
 	200, -- Y
 	100, -- minX
 	100 -- minY
-) 
-local gui = plugin:CreateDockWidgetPluginGui("TwitchBlox", info)
-
-local title = Instance.new("TextLabel", gui)
-title.Text = "Hello world"
-title.Size = UDim2.new(1, 0, 1, 0)
-
-]]
-
-local mdii = plugin.MultipleDocumentInterfaceInstance
-mdii.DataModelSessionStarted:Connect(function(session)
-	print("Data model session started : ", session)
+)
+local pluginGui = plugin:CreateDockWidgetPluginGui(plugin.Name, info)
+local toolbar = plugin:CreateToolbar(plugin.Name)
+local toggleButton = toolbar:CreateButton("Show Sandbox", "Toggle the widget", "")
+toggleButton.Click:Connect(function()
+	pluginGui.Enabled = not pluginGui.Enabled
 end)
+gui:BindToClose(function()
+	pluginGui.Enabled = false
+end)
+local root = Roact.mount(MainUI, pluginGui)
 
-mdii.DataModelSessionEnded:Connect(function(session)
-	print("session ending : ", session)
+
+plugin.Unloading:Connect(function()
+	sm:get("NetworkingManager"):stopPolling()
+	root:unmount()
 end)
