@@ -1,5 +1,5 @@
-local pluginRoot = script.Parent
-local ManagersFolder = pluginRoot.ManagersFolder
+local pluginRoot = script:FindFirstAncestorOfClass("Plugin").TwitchBloxPlugin
+local ManagersFolder = pluginRoot.Managers
 local SingletonManager = require(ManagersFolder.SingletonManager)
 
 

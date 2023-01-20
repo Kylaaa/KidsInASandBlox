@@ -114,9 +114,9 @@ function Networking:request(options)
 				local msg = table.concat(
 				{
 					"--------------------------",
-					"Fetching Url :" .. url, "",
+					"Fetching Url :" .. options.Url, "",
 					"Success :" .. tostring(success), "",
-					"Result :", tostring(resultDict),
+					"Result :", HttpService:JSONEncode(resultDict),
 					"--------------------------"
 				}, "\n")
 				print(msg)

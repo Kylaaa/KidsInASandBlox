@@ -1,9 +1,10 @@
-local plugin = script:FindFirstAncestorOfClass("Plugin").TwitchBloxPlugin
+local plugin = script:FindFirstAncestorOfClass("Plugin")
+local pluginRoot = plugin.TwitchBloxPlugin
 
-local LibsFolder = plugin.Libs
+local LibsFolder = pluginRoot.Libs
 local Roact = require(LibsFolder.Roact)
 
-local UIFolder = plugin.UI
+local UIFolder = pluginRoot.UI
 local MainUI = require(UIFolder.MainUI)
 
 
@@ -46,10 +47,11 @@ function TwitchBloxManager:createPluginToolbar()
 			self:disable()
 		end
 	end)
-	gui:BindToClose(function()
+	pluginGui:BindToClose(function()
 		pluginGui.Enabled = false
 	end)
-	Roact.mount(MainUI, pluginGui)
+	local app = Roact.createElement(MainUI) 
+	Roact.mount(app, pluginGui)
 end
 
 function TwitchBloxManager:start()
@@ -58,8 +60,11 @@ end
 
 function TwitchBloxManager:enable()
 	local nm = self.dependencies.NetworkingManager
-	nm:startPolling("", function(changes)
+	local cm = self.dependencies.ConfigurationManager
 
+	local path = cm:getValue("HTTP_PATH")
+	nm:startPolling(path, function(changes)
+		print("Changes since last request : ", changes)
 	end)
 end
 

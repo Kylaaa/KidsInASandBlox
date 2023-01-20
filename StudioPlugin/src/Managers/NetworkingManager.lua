@@ -17,7 +17,9 @@ function NetworkingManager.new(dependencies : {})
 		port = cm:getValue("HTTP_PORT"),
 		interval = cm:getValue("HTTP_POLLING_INTERVAL"),
 		timeout = cm:getValue("HTTP_POLLING_TIMEOUT"),
-		httpImpl = Http.new(),
+		httpImpl = Http.new({
+			DEBUG = cm:getValue("HTTP_DEBUG"),
+		}),
 		connections = {},
 	}
 	setmetatable(nm, NetworkingManager)
@@ -34,7 +36,7 @@ function NetworkingManager:updatePort(newPort : string)
 end
 
 function NetworkingManager:startPolling(path : string, onResponse : ({}) -> ())
-	local targetUrl = string.format("%s:%s/%s", self.host, self.port, path)
+	local targetUrl = string.format("http://%s:%s/%s", self.host, self.port, path)
 
 	-- don't dispatch a new request until the old one finishes
 	local requestDebounce = false
@@ -52,13 +54,13 @@ function NetworkingManager:startPolling(path : string, onResponse : ({}) -> ())
 
 		requestDebounce = true
 		local requestPromise = self.httpImpl:GET(targetUrl)
-		self.httpImpl:parseJson(requestPromise):andThen(function(responseJSON)
+		self.httpImpl:parseJSON(requestPromise):andThen(function(responseJSON)
 			print("Changes since last request : ", responseJSON)
 			onResponse(responseJSON)
 			requestDebounce = false
 			timeSinceLastPoll = self.interval
 		end, function(parseError)
-			warn("failed to parse JSON with error : " .. parseError)
+			warn("failed to parse JSON with error : " .. (parseError or ""))
 			requestDebounce = false
 			timeSinceLastPoll = self.interval
 		end)
@@ -66,7 +68,7 @@ function NetworkingManager:startPolling(path : string, onResponse : ({}) -> ())
 end
 
 function NetworkingManager:stopPolling()
-	for _, connection in ipairs(connections) do
+	for _, connection in ipairs(self.connections) do
 		connection:Disconnect()
 	end
 end

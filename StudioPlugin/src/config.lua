@@ -8,10 +8,11 @@ return {
 	PLUGIN_SIZE_Y_INIT = 200, -- pixels
 
 	-- networking
+	HTTP_DEBUG = false,
 	HTTP_HOST = "localhost",
-	HTTP_PORT = "3030",
-	HTTP_PATH = "",
-	HTTP_POLLING_INTERVAL = 500, -- ms
+	HTTP_PORT = "3000",
+	HTTP_PATH = "changes",
+	HTTP_POLLING_INTERVAL = 1500, -- ms
 	HTTP_POLLING_TIMEOUT = 2000, -- ms
 
 	-- logging

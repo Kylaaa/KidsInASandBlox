@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "express": "^4.18.2",
+    "websocket": "^1.0.34"
+  },
+  "name": "twitchblox",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "Kyler Mulherin",
+  "license": "ISC",
+  "description": ""
+}
