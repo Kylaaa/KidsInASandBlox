@@ -10,11 +10,13 @@ local NetworkingManager = {}
 NetworkingManager.__index = NetworkingManager
 
 function NetworkingManager.new(dependencies : {})
+	local cm = dependencies.ConfigurationManager
+
 	local nm = {
-		host = "localhost",
-		port = "8080",
-		interval = 1000, --ms
-		timeout = 2000, --ms
+		host = cm:getValue("HTTP_HOST"),
+		port = cm:getValue("HTTP_PORT"),
+		interval = cm:getValue("HTTP_POLLING_INTERVAL"),
+		timeout = cm:getValue("HTTP_POLLING_TIMEOUT"),
 		httpImpl = Http.new(),
 		connections = {},
 	}
@@ -31,13 +33,34 @@ function NetworkingManager:updatePort(newPort : string)
 	self.port = newPort
 end
 
-function NetworkingManager:beginPolling(path : string, onResponse : ({}) -> ())
+function NetworkingManager:startPolling(path : string, onResponse : ({}) -> ())
 	local targetUrl = string.format("%s:%s/%s", self.host, self.port, path)
-	table.insert(self.connections, RunService.Heartbeat:Connect(function(deltaTime)
+
+	-- don't dispatch a new request until the old one finishes
+	local requestDebounce = false
+	local timeSinceLastPoll = self.interval
+
+	table.insert(self.connections, RunService.Heartbeat:Connect(function(deltaTimeS)
+		if requestDebounce then
+			return
+		end
+
+		timeSinceLastPoll -= (deltaTimeS * 1000)
+		if timeSinceLastPoll > 0 then
+			return
+		end
+
+		requestDebounce = true
 		local requestPromise = self.httpImpl:GET(targetUrl)
 		self.httpImpl:parseJson(requestPromise):andThen(function(responseJSON)
 			print("Changes since last request : ", responseJSON)
 			onResponse(responseJSON)
+			requestDebounce = false
+			timeSinceLastPoll = self.interval
+		end, function(parseError)
+			warn("failed to parse JSON with error : " .. parseError)
+			requestDebounce = false
+			timeSinceLastPoll = self.interval
 		end)
 	end))
 end

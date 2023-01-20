@@ -1,7 +1,11 @@
+local _instance = nil
+
 local SingletonManager = {}
 SingletonManager.__index = SingletonManager
 
 function SingletonManager.new()
+	assert(_instance == nil, "Cannot create multiple instances of the SingletonManager")
+
 	local self = {
 		singletonModules = {}, -- { Instance }
 		dependencies = {}, -- { Instance, { Instance }}
@@ -11,8 +15,12 @@ function SingletonManager.new()
 		singletons = {}, -- { string, table }
 	}
 	setmetatable(self, SingletonManager)
-
+	_instance = self
 	return self
+end
+
+function SingletonManager.getInstance()
+	return _instance
 end
 
 function SingletonManager:registerSingleton(moduleScript : ModuleScript, dependencies : { ModuleScript })
@@ -68,6 +76,5 @@ function SingletonManager:get(managerName : string)
 	assert(manager ~= nil, "COULD NOT FIND MANAGER WITH NAME " .. managerName)
 	return manager
 end
-
 
 return SingletonManager
