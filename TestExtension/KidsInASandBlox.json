@@ -1,7 +1,7 @@
 {
   "allowHttpBackend": false,
-  "backendCommand": "",
-  "backendFolderName": "",
+  "backendCommand": "node backend -c \"njogekp2yhzp16pceno1j2tzlmt5l6\" -s \"/s/bmwhtHUGO2A1OKfoL0DH1ZvJd73NO8lLAxOicDGs=\"",
+  "backendFolderName": "extension-getting-started\\services",
   "certificateExceptions": [],
   "extensionViews": [
     {
@@ -19,7 +19,7 @@
       },
       "id": "1",
       "isPopout": false,
-      "label": "RobloxAccount",
+      "label": "",
       "linked": false,
       "linkedUserId": "",
       "orientation": "Portrait",
@@ -85,7 +85,7 @@
     "whitelistedPanelUrls": []
   },
   "frontendCommand": "",
-  "frontendFolderName": "contents\\public",
+  "frontendFolderName": "extension-getting-started\\public",
   "name": "KidsInASandBlox",
   "usingRandomFrontendHostingPort": false,
   "version": 3

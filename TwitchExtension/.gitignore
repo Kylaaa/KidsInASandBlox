@@ -1,2 +1,3 @@
-.vs/
-node_modules/
+# build directories
+.vs/*
+node_modules/*
