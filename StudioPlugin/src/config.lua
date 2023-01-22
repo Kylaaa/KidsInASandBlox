@@ -8,14 +8,52 @@ return {
 	PLUGIN_SIZE_Y_INIT = 200, -- pixels
 
 	-- networking
-	HTTP_DEBUG = false,
-	HTTP_HOST = "localhost",
+	HTTP_DEBUG = true,
 	HTTP_PORT = "3000",
-	HTTP_PATH = "changes",
 	HTTP_POLLING_INTERVAL = 1500, -- ms
 	HTTP_POLLING_TIMEOUT = 2000, -- ms
 
 	-- logging
 	LOGGING_LEVEL = 0, -- none
 	LOG_TO_OUTPUT = true,
+
+	-- twitch events
+	TWITCH_OBSERVED_EVENTS = {
+		{
+			name = "channel.follow",
+			version = 1,
+		},
+		{
+			name = "channel.subscribe",
+			version = 1,
+		},
+		{
+			name = "channel.subscriptin.gift",
+			version = 1,
+		},
+		{
+			name = "channel.subscription.message",
+			version = 1,
+		},
+		{
+			name = "channel.cheer",
+			version = 1,
+		},
+		{
+			name = "channel.raid",
+			version = 1,
+		},
+		{
+			name = "channel.hype_train.begin",
+			version = 1,
+		},
+		{
+			name = "channel.hype_train.progress",
+			version = 1,
+		},
+		{
+			name = "channel.hype_train.end",
+			version = 1,
+		},
+	},
 }

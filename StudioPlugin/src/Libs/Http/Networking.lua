@@ -114,10 +114,12 @@ function Networking:request(options)
 				local msg = table.concat(
 				{
 					"--------------------------",
-					"Fetching Url :" .. options.Url, "",
-					"Success :" .. tostring(success), "",
+					"Fetching Url :" .. options.Url,
+					"Body:" .. (options.Body or ""),
+					"Success :" .. tostring(success),
 					"Result :", HttpService:JSONEncode(resultDict),
-					"--------------------------"
+					"--------------------------",
+					"",
 				}, "\n")
 				print(msg)
 			end
@@ -205,7 +207,7 @@ function Networking:POST(url, body, customHeaders)
 	end
 
 	assert(type(url) == "string", "expected 'url' to be a string")
-	assert(type(body) == "string", "expected 'body' to be a string")
+	assert(type(body or "") == "string", "expected 'body' to be a string")
 	assert(type(customHeaders) == "table", "expected 'customHeaders' to be a dictionary")
 
 	return self:request({

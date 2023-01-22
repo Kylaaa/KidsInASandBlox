@@ -16,11 +16,16 @@ sm:registerSingleton(ManagersFolder.NetworkingManager, {
 sm:registerSingleton(ManagersFolder.NPCManager, {
 	ManagersFolder.ConfigurationManager,
 })
+sm:registerSingleton(ManagersFolder.PersistenceManager, {
+	ManagersFolder.ConfigurationManager,
+	ManagersFolder.StateManager,
+})
 sm:registerSingleton(ManagersFolder.StateManager, {
 	ManagersFolder.LogManager,
 })
 sm:registerSingleton(ManagersFolder.TwitchBloxManager, {
 	ManagersFolder.ConfigurationManager,
+	ManagersFolder.PersistenceManager,
 	ManagersFolder.LogManager,
 	ManagersFolder.NetworkingManager,
 	ManagersFolder.NPCManager,

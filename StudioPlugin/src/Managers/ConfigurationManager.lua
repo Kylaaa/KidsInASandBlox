@@ -16,7 +16,7 @@ function ConfigurationManager.new(dependencies : {})
 end
 
 function ConfigurationManager:getValue(key : string)
-	if not self[key] then
+	if self[key] == nil then
 		error(string.format("No value loaded for key, %s", key), 1)
 		return nil
 	end
@@ -25,7 +25,7 @@ function ConfigurationManager:getValue(key : string)
 end
 
 function ConfigurationManager:setValue(key : string, value : any)
-	if not self[key] then
+	if self[key] == nil then
 		error(string.format("Could not set value for key, %s", key), 1)
 		return
 	end

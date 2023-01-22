@@ -7,6 +7,9 @@ local Roact = require(LibsFolder.Roact)
 local UIFolder = pluginRoot.UI
 local MainUI = require(UIFolder.MainUI)
 
+local UtilFolder = pluginRoot.Util
+local getSubscribedTwitchEvents = require(UtilFolder.getSubscribedTwitchEvents)
+
 
 local TwitchBloxManager = {}
 TwitchBloxManager.__index = TwitchBloxManager
@@ -18,6 +21,14 @@ function TwitchBloxManager.new(dependencies : {})
 	setmetatable(tbm, TwitchBloxManager)
 
 	return tbm
+end
+
+
+--[[ helper functions]]
+function TwitchBloxManager:initializeStateFromSettings()
+	-- load the stored persistent data, use that to initialize the plugin
+	local pm = self.dependencies.PersistenceManager
+	pm:loadTwitchEvents()
 end
 
 function TwitchBloxManager:createPluginToolbar()
@@ -54,25 +65,47 @@ function TwitchBloxManager:createPluginToolbar()
 	Roact.mount(app, pluginGui)
 end
 
+
+
+--[[ The plugin has been initialized ]]
 function TwitchBloxManager:start()
+	self:initializeStateFromSettings()
 	self:createPluginToolbar()
 end
 
+--[[ The plugin has been enabled and the dockwidget is visible ]]
 function TwitchBloxManager:enable()
 	local nm = self.dependencies.NetworkingManager
 	local cm = self.dependencies.ConfigurationManager
+	local function beginPolling()
+		nm:startPollingForChanges(function(changes)
+			print("Changes since last request : ", changes)
+		end)
+	end
 
-	local path = cm:getValue("HTTP_PATH")
-	nm:startPolling(path, function(changes)
-		print("Changes since last request : ", changes)
+	nm:checkIfConnectedToTwitch(function(isConnected, message)
+		if isConnected then
+			beginPolling()	
+		else
+			local events = getSubscribedTwitchEvents()
+			nm:subscribeToEvents(events, function(success, message)
+
+				nm:connectToTwitch(function()
+				end);
+			end);
+			
+		end
 	end)
+	
 end
 
+--[[ The plugin has simply been closed and the dockwidget is no longer visible ]]
 function TwitchBloxManager:disable()
 	local nm = self.dependencies.NetworkingManager
 	nm:stopPolling()
 end
 
+--[[ The plugin is being uninstalled, or the datamodel is closing ]]
 function TwitchBloxManager:cleanUp()
 	local nm = self.dependencies.NetworkingManager
 	nm:stopPolling()
