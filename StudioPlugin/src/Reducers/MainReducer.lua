@@ -7,7 +7,8 @@ local ReducersFolder = plugin.Reducers
 local MainReducer = Rodux.combineReducers({
 	Characters = require(ReducersFolder.Characters),
 	Messages = require(ReducersFolder.Messages),
-	TwitchEvents = require(ReducersFolder.TwitchEvents),
+	PluginData = require(ReducersFolder.PluginData),
+	TwitchUser = require(ReducersFolder.TwitchUser),
 })
 
 return MainReducer

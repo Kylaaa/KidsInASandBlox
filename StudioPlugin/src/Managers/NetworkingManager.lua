@@ -6,6 +6,9 @@ local Http = require(Libs.Http)
 local HttpService = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
 
+local UtilFolder = plugin.Util
+local getSubscribedTwitchEvents = require(UtilFolder.getSubscribedTwitchEvents)
+
 
 local NetworkingManager = {}
 NetworkingManager.__index = NetworkingManager
@@ -28,12 +31,40 @@ function NetworkingManager.new(dependencies : {})
 	return nm
 end
 
+function NetworkingManager:constructLocalhostUrl(path : string, args : {}?) : string
+	local argString = ""
+	if args and next(args) ~= nil then
+		local argList = {}
+		for k, v in pairs(args) do
+			table.insert(argList, string.format("%s=%s", k, HttpService:UrlEncode(v)))
+		end
+		argString = "?" .. table.concat(argList, "&")
+	end
+	return string.format("http://%s:%s/%s%s", self.host, self.port, path, argString)
+end
+
+function NetworkingManager:authenticateWithTwitch(onResponse : ()->())
+	local events = getSubscribedTwitchEvents()
+	local scopes = {}
+	for eventName, eventData in pairs(events) do
+		table.insert(scopes, eventData.scope)
+	end
+	local args = { 
+		scopes = table.concat(scopes, "+"),
+	}
+	local targetUrl = self:constructLocalhostUrl("requestLogin", args)
+	self.httpImpl:GET(targetUrl):andThen(function(response)
+		-- hopefully returns a broadcasterId
+		print(response)
+	end)
+end
+
 
 --[[
 	Due to the nature of the Edit / Play datamodel lifecycle, it's important to check if the local server has connected to Twitch yet.
 ]]
 function NetworkingManager:checkIfConnectedToTwitch(onResponse : (bool, string)->())
-	local targetUrl = string.format("http://%s:%s/checkConnection", self.host, self.port)
+	local targetUrl = self:constructLocalhostUrl("checkConnection")
 	local fetchPromise = self.httpImpl:GET(targetUrl)
 	self.httpImpl:parseJSON(fetchPromise):andThen(function(responseJSON)
 		-- check if we are actually connected
@@ -107,6 +138,10 @@ function NetworkingManager:stopPolling()
 	for _, connection in ipairs(self.connections) do
 		connection:Disconnect()
 	end
+end
+
+function NetworkingManager:getBroadcasterId(channelUrl : string)
+	
 end
 
 return NetworkingManager

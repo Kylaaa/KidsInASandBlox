@@ -5,14 +5,5 @@ local getCurrentState = require(UtilFolder.getCurrentState)
 
 return function()
 	local state = getCurrentState()
-	local TwitchEvents = state.TwitchUser.events
-
-	local subscriptions = {}
-	for name, eventData in pairs(TwitchEvents) do
-		if eventData.enabled == true then
-			subscriptions[name] = eventData.version
-		end
-	end
-
-	return subscriptions
+	return state.PluginData.isInitialized
 end

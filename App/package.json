@@ -1,9 +1,11 @@
 {
   "dependencies": {
     "express": "^4.18.2",
-    "websocket": "^1.0.34"
+    "uuid": "^9.0.0",
+    "websocket": "^1.0.34",
+    "webview": "^1.0.0"
   },
-  "name": "twitchblox",
+  "name": "kidsinasandblox",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {

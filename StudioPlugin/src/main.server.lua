@@ -18,10 +18,10 @@ sm:registerSingleton(ManagersFolder.NPCManager, {
 })
 sm:registerSingleton(ManagersFolder.PersistenceManager, {
 	ManagersFolder.ConfigurationManager,
-	ManagersFolder.StateManager,
 })
 sm:registerSingleton(ManagersFolder.StateManager, {
 	ManagersFolder.LogManager,
+	ManagersFolder.PersistenceManager,
 })
 sm:registerSingleton(ManagersFolder.TwitchBloxManager, {
 	ManagersFolder.ConfigurationManager,

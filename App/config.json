@@ -1,6 +1,9 @@
 {
-	"APP_NAME" : "KidsInASandBlox",
+	"APP_NAME" : "Kids In A SandBlox",
 	"PUBLIC_PORT" : 3000,
+	"CLIENT_ID" : "yj5phjmty3v747fr6lfnbzyzdptplw",
+    "CLIENT_SECRET" : "",
+
 
 	"TEST_JSON" : [
     {
@@ -12,5 +15,7 @@
         "name" : "itrxw",
         "action" : "wave",
         "message" : ""
-    }]
+    }],
+
+
 }

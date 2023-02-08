@@ -4,18 +4,27 @@
 
 const config = require('./config.json')
 const express = require('express');
-const twitchWSClient = require('./twitchWSClient.js')
+const twitchWSClient = require('./twitchWSClient.js');
+const twitchOAuthWebview = require('./twitchOAuthWebview.js');
 
-
-var messages = {};
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded());
 
+var messages = {};
+
+
 twitchWSClient.onMessage.connect(function(message){
 	console.log("New message from twitch!", message);
 	messages.push(message);
+});
+
+/*
+	Provide a simple endpoint that the Studio Plugin can hit to quickly verify that the server is running
+*/
+app.get("/isAlive", function(request, response, next){
+	response.json(JSON.stringify("{ 'isAlive' = 'true' }"))
 });
 
 /*
@@ -24,7 +33,7 @@ twitchWSClient.onMessage.connect(function(message){
 app.get("/checkConnection", function(request, response, next){
 	const isConnected = twitchWSClient.checkIsConnectedToTwitch();
 	response.json(JSON.stringify(isConnected));
-})
+});
 
 /*
 	Should be called once when Studio tells the app it is ready
@@ -35,6 +44,20 @@ app.post("/connectToTwitch", function(request, response, next){
 		twitchWSClient.startTwitchClient();
 	};
 	response.json({});
+});
+
+/*
+	Register a public callback for the login url
+*/
+app.get("/authenticate", function(request, response, next){
+	// store the console auth token
+	console.log(request);
+});
+app.get("/requestLogin", function(request, response, next){
+	const scopes = {};
+	console.log(request.body);
+	console.log(typeof(request.body));
+	//twitchOAuthWebview(scopes);
 });
 
 /*

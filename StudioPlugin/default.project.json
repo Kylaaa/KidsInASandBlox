@@ -1,6 +1,14 @@
 {
 	"name" : "TwitchBloxPlugin",
 	"tree" : {
-		"$path" : "src"
+		"$path" : "src",
+
+		"Events" : {
+			"$className" : "Folder",
+
+			"UpdateSetting" : {
+				"$className" : "BindableEvent"
+			}
+		}
 	}
 }
