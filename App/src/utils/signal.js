@@ -1,4 +1,4 @@
-var event = {
+const signal = {
 	"name" : "",
 	"callbacks" : [],
 	connect : function(callback) {
@@ -11,10 +11,8 @@ var event = {
 	}
 };
 
-module.exports = {
-	createEvent : function(name) {
-		var newEvent = Object.create(event);
-		newEvent.name = name;
-		return newEvent;
-	}
+module.exports = function(name) {
+	var newSignal = Object.create(signal);
+	newSignal.name = name;
+	return newSignal;
 };

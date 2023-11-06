@@ -1,5 +1,5 @@
 /*
-	A web socket client to listen for messages from Twitch
+	A web socket client to listen for messages from Twitch, and to dispatch authenticated requests
 */
 
 const config = require('./config.json')

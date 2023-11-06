@@ -6,7 +6,7 @@ const config = require('./config.json')
 
 const http = require('http');
 const WebSocketClient = require('websocket').client;
-const createEvent = require('./event.js').createEvent;
+const createEvent = require('./event.js');
 
 const twitchObserver = new WebSocketClient();
 
