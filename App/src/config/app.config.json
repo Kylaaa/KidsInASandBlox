@@ -10,5 +10,7 @@
     	"HEIGHT" : 600
     },
 
-    "LOG_LEVEL" : 4
+    "LOG_LEVEL" : 4,
+
+    "CLEAR_DATABASE_ON_START" : true
 }

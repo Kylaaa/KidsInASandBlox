@@ -2,14 +2,15 @@
  * A service that communicates with Twitch's APIs and WebSockets and routes events outwards
  */
 
+class TwitchService {
+    constructor(logsService, eventsService) {
 
+    }
 
+    getScopes() {
 
-function getScopes() {
-
+    }
 }
 
 
-module.exports = {
-    getScopes : getScopes,
-}
+module.exports = TwitchService;

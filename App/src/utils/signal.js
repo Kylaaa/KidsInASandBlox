@@ -1,18 +1,34 @@
-const signal = {
-	"name" : "",
-	"callbacks" : [],
-	connect : function(callback) {
-		this.callbacks.push(callback);
-	},
-	fire : function(...args) {
-		this.callbacks.foreach(function(callback) {
-			callback(args);
-		})
-	}
-};
+const { randomUUID } = require('node:crypto');
 
-module.exports = function(name) {
-	var newSignal = Object.create(signal);
-	newSignal.name = name;
-	return newSignal;
-};
+class signal {
+	name;
+	callbacks = {}; // <string, (...)=>()>
+
+	constructor(name) {
+		this.name = name;
+	};
+
+	connect(callback) {
+		const nextId = randomUUID();
+		this.callbacks[nextId] = callback;
+
+		// return a disconnect token
+		let disconnect = ()=>{
+			delete this.callbacks[nextId];
+		}
+		return disconnect;
+	};
+
+	fire(...args) {
+		for (const [_, callback] of Object.entries(this.callbacks)) {
+			try {
+				callback(...args);
+			} catch(e) {
+				console.error(`Signal(${this.name}) threw an error when firing : ${e.message}`);
+				throw(e);
+			}
+		};
+	}
+}
+
+module.exports = signal;

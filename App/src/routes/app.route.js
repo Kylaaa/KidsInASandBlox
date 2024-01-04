@@ -4,7 +4,7 @@ function createRoutes(appController) {
 	const router = express.Router();
 	router.get('/authenticate', appController.authenticate);
 
-	router.get('/changes', appController.getChanges);
+	router.get('/changes', appController.changes);
 
 	router.post('/login', appController.authenticate);
 	router.put('/subscribe', appController.subscribe);

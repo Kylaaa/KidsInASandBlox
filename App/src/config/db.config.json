@@ -1,5 +1,6 @@
 {
-	"host": "localhost",
-	"user": "admin",
-	"password": "password",
+	"VERBOSE_DEBUGGING" : true,
+	"PATH_TO_DB" : ":memory:",
+	"DB_MODE" : "OPEN_READWRITE | OPEN_CREATE | OPEN_FULLMUTEX",
+	"EVENTS_TABLE_NAME" : "events"
 }

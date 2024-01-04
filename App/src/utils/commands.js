@@ -1,18 +1,28 @@
 const config = require('./../config/app.config.json');
 const signal = require('./signal.js');
 
-const { program } = require('commander');
+const { Command } = require('commander');
 
-const onRun = signal("OnRun");
-const onLogin = signal("OnLogin");
-const onLogout = signal("OnLogout");
+const onRun = new signal("OnRun");
+const onLogin = new signal("OnLogin");
+const onLogout = new signal("OnLogout");
+const onConfigure = new signal("OnConfigure");
 
+const program = new Command();
 
 program
     .name(config.APP_NAME)
-    .description(config.DESCRIPTION)
     .version(config.VERSION)
-    .action(onRun.fire);
+    .action(()=>{
+        onRun.fire();
+    });
+
+program
+    .description(config.DESCRIPTION);
+
+program.command('configure')
+    .description('Change a value stored in configuration')
+    .action(onConfigure.fire);
 
 program.command('login')
     .description('Log into a Twitch account through an OAuth2.0 window')
@@ -22,13 +32,11 @@ program.command('logout')
     .description('Clears the currently authenticated session')
     .action(onLogout.fire);
 
-
-//program.parse(process.argv);
-
 module.exports = {
     onRun : onRun,
+    onConfigure : onConfigure,
     onLogin : onLogin,
-    onLogout : onLogout
+    onLogout : onLogout,
 
     // the caller will handle calling the parse function
     program : program

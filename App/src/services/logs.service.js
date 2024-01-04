@@ -1,3 +1,4 @@
+const assert = require('assert');
 const config = require('./../config/app.config.json');
 const signal = require('./../utils/signal.js');
 
@@ -9,29 +10,31 @@ const LOG_LEVEL = {
 	TRACE: 4
 };
 
-const OnMessage = signal("OnMessage");
+class logService {
+	static LEVEL = LOG_LEVEL;
 
-function log(level, ...args) {
-	assert(level != LOG_LEVEL.NONE);
-	if (config.LOG_LEVEL >= level) {
-		OnMessage.fire(...args);
+	OnMessage = new signal("OnMessage"); // (int, ...<any>)=>()
+
+	log(level, ...args) {
+		assert(level != LOG_LEVEL.NONE);
+		if (config.LOG_LEVEL >= level) {
+			this.OnMessage.fire(level, ...args);
+		}
+	}
+	error(...args) {
+		this.log(LOG_LEVEL.ERROR, ...args);
+	}
+	warn(...args) {
+		this.log(LOG_LEVEL.WARNING, ...args);
+	}
+	message(...args) {
+		this.log(LOG_LEVEL.MESSAGE, ...args);
+	}
+	trace(...args) {
+		this.log(LOG_LEVEL.TRACE, ...args);
 	}
 }
-function error(...args) {
-	log(LOG_LEVEL.ERROR, args);
-}
-function warn(...args) {
-	log(LOG_LEVEL.WARNING, args);
-}
-function trace(...args) {
-	log(LOG_LEVEL.TRACE, args);
-}
 
-module.exports = {
-	error : error,
-	warn : warn,
-	message : message,
-	trace : trace,
 
-	OnMessage : OnMessage
-};
+
+module.exports = logService;

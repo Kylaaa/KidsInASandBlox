@@ -2,19 +2,29 @@
  * A service that holds onto the list of observed events.
  */
 
+class eventsService {
+	#dependencies = {};
 
+	get logger() {
+		return this.#dependencies['logs'];
+	}
+	get db() {
+		return this.#dependencies['db'];
+	}
 
+	constructor(logsService, dbService){
+		this.#dependencies['logs'] = logsService;
+		this.#dependencies['db'] = dbService;
+	}
 
-function pushEvent(evt){
-	events.push(evt);
-};
+	pushEvent(evt) {
+		this.db.addEvent(evt);
+	}
 
-function getEvents() {
+	getEvents(start, end) {
+		let events = this.db.getEventsBetweenDates(start, end);
+		return events;
+	}
+}
 
-	return events;
-};
-
-module.exports = {
-	pushEvent : pushEvent,
-	getEvents : getEvents
-};
+module.exports = eventsService;
