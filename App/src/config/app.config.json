@@ -11,6 +11,21 @@
     },
 
     "LOG_LEVEL" : 4,
+    "ENABLE_DEBUG_ENDPOINTS" : true,
 
-    "CLEAR_DATABASE_ON_START" : true
+    "CLEAR_DATABASE_ON_START" : true,
+
+    "DOCUMENTATION_INFO" : {
+    	"openapi" : "3.1.0",
+    	"description" : "This application connects a Roblox session to a Twitch streams events.",
+    	"license" : {
+    		"name" : "GPLv3",
+        	"url" : "https://www.gnu.org/licenses/gpl-3.0.en.html"
+    	},
+    	"contact" : {
+        	"name" : "Kyler Mulherin",
+        	"url" : "https://itreallyiskyler.com",
+        	"email" : "kyler.mulherin@gmail.com"
+    	}
+    }
 }

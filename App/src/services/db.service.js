@@ -37,29 +37,86 @@ class dbService {
 		}
 
 		let fields = [
-			"id INT AUTO_INCREMENT PRIMARY KEY",
+			"id INTEGER PRIMARY KEY AUTOINCREMENT",
 			"data TEXT",
 			"received_date DATETIME DEFAULT CURRENT_TIMESTAMP",
 		]
-		db.run(`CREATE TABLE ${dbConfig.EVENTS_TABLE_NAME} (${fields.toString()})`);
+		db.run(`CREATE TABLE events (${fields.toString()})`);
 
 		return db;
 	}
 
 	
 	addEvent(eventData) {
-		let insertQuery = `INSERT INTO ${dbConfig.EVENTS_TABLE_NAME} (data) VALUES (${eventData})`;
-		this.#db.run(insertQuery);
+		return new Promise((resolve, reject)=>{
+			let insertQuery = "INSERT INTO events (data) VALUES (?)";
+			this.#db.run(insertQuery, JSON.stringify(eventData), (err)=>{
+				if (err) {
+					let logger = this.#dependencies['logs'];
+					logger.error(`Threw an error while adding an event (${JSON.stringify(eventData)}) : `, err);
+					reject(err);
+				}
+				else {
+					resolve();
+				}
+			});
+		});
+	}
+
+	getAllEvents() {
+		return new Promise((resolve, reject) => {
+			let selectQuery = "SELECT data FROM events ORDER BY received_date ASC";
+			return this.#db.all(selectQuery, (err, rows)=>{
+				if (err) {
+					let logger = this.#dependencies['logs'];
+					logger.error("Threw an error while getting all events : ", err);
+					reject(err);
+				}
+				else {
+					let cleanedData = [];
+					for (let [i, dataObj] of Object.entries(rows)) {
+						cleanedData[i] = JSON.parse(dataObj['data']);
+					}
+					resolve(cleanedData);
+				}
+			});
+		});
 	}
 
 	getEventsBetweenDates(start, end) {
-		let selectQuery = `SELECT data FROM ${dbConfig.table_events} WHERE (received_date >= ${start}) AND (received_date <= ${end})`;
-		this.#db.run(selectQuery);
+		return new Promise((resolve, reject)=>{
+			let startDateTime = new Date(start.toString()).toISOString();
+			let endDateTime = new Date(end.toString()).toISOString();
+			let selectQuery = "SELECT data FROM events " +
+				"WHERE (received_date >= ?) AND (received_date <= ?) " +
+				"ORDER BY received_date ASC";
+			return this.#db.all(selectQuery, startDateTime, endDateTime, (err, rows)=>{
+				if (err) {
+					let logger = this.#dependencies['logs'];
+					logger.error(`Threw an error while getting events between dates [${startDateTime}, ${endDateTime}]: `, err);
+					reject(err);
+				}
+				else {
+					resolve(rows);
+				}
+			});
+		});
 	}
 
 	clearEvents() {
-		let clearQuery = `TRUNCATE TABLE ${dbConfig.table_events}`
-		this.#db.run(clearQuery);
+		return new Promise((resolve, reject) => {
+			let clearQuery = `TRUNCATE TABLE events`;
+			this.#db.run(clearQuery, (err)=>{
+				if (err) {
+					let logger = this.#dependencies['logs'];
+					logger.error(`Threw an error while clearing the events table: `, err);
+					reject(err);
+				}
+				else {
+					resolve();
+				}
+			});
+		});
 	}
 
 	close() {

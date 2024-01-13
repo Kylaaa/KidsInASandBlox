@@ -1,16 +1,14 @@
-/*
- *
- */
-const config = require('./../config/app.config.json')
-const twitchOAuthWebview = require('./../utils/twitchOAuthWebview.js')
+const config = require('./../config/app.config.json');
+const twitchOAuthWebview = require('./../utils/twitchOAuthWebview.js');
+const createErrResponse = require('./../models/createErrorResponse.js');
 
 
 class AppController {
 	#dependencies = {};
 
-	constructor(logsService, eventsService, twitchService) {
+	constructor(logsService, dbService, twitchService) {
 		this.#dependencies['logs'] = logsService;
-		this.#dependencies['events'] = eventsService;
+		this.#dependencies['db'] = dbService;
 		this.#dependencies['twitch'] = twitchService;
 	}
 
@@ -23,7 +21,7 @@ class AppController {
 
 	// Provide a simple endpoint that the Studio Plugin can hit to quickly verify that the server is running
 	isAlive(request, response, next) {
-		response.json(JSON.stringify({ 'isAlive' : 'true' }))
+		response.json({ isAlive : 'true' })
 	};
 
 	// The Studio plugin will likely connect and disconnect repeatedly, this endpoint will serve to tell the plugin whether any initialization needs to happen
@@ -71,11 +69,25 @@ class AppController {
 	};
 
 	//return the messages that have come in since the last time they were requested
-	changes(request, response, next) {
-		response.json(messages);
+	async events(request, response, next) {
+		let logger = this.#dependencies['logs'];
 
-		// clear out the message queue
-		messages = {};
+		let query = request.query;
+		let start = query['start'];
+		let end = query['end'];
+		if (new Date(start) > new Date(end)) {
+			response.status(400);
+			response.json(createErrResponse("Start date must come before the end date"));
+			return;
+		}
+
+		let db = this.#dependencies['db'];
+		let events = await db.getEventsBetweenDates(start, end);
+
+		response.json({
+			success: true,
+			events: events
+		});
 	};
 }
 
