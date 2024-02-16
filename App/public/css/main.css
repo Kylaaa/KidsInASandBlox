@@ -1,0 +1,14 @@
+@media (prefers-color-scheme: light) {
+  body {
+    background-color: #d1d0d3;
+    color: #131018;
+  }
+}
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #131018;
+    color: #7D6a95;
+  }
+}
+
+/*# sourceMappingURL=main.css.map */

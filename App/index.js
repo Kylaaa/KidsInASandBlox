@@ -7,36 +7,17 @@ const swaggerJsdoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 
 const AppController = require('./src/controllers/app.controller.js');
+const AuthController = require('./src/controllers/auth.controller.js');
 const commands = require('./src/utils/commands.js');
 const config = require('./src/config/app.config.json');
 const createAppRouter = require('./src/routes/app.route.js');
+const createAuthRouter = require('./src/routes/auth.route.js');
 const createEventsRouter = require('./src/routes/events.route.js');
+const createRootRouter = require('./src/routes/root.route.js');
 const DbService = require('./src/services/db.service.js');
 const EventsController = require('./src/controllers/events.controller.js');
 const LogService = require('./src/services/logs.service.js');
 const TwitchService = require('./src/services/twitch.service.js');
-
-
-let ls = new LogService();
-ls.OnMessage.connect(function(level, ...args){
-    const outFunc = {
-        1: console.error,
-        2: console.warn,
-        3: console.log,
-        4: console.info
-    };
-    outFunc[level](...args);
-});
-
-let dbs = new DbService(ls);
-let ts = new TwitchService(ls, dbs);
-
-// create the public controllers and the endpoints that access their methods
-let appController = new AppController(ls, dbs, ts);
-let appRouter = createAppRouter(appController);
-
-let eventsController = new EventsController(ls, dbs, ts);
-let eventsRouter = createEventsRouter(eventsController);
 
 // construct the docs
 const options = {
@@ -60,23 +41,56 @@ const options = {
 };
 const specs = swaggerJsdoc(options);
 
+// initialize the services
+let ls = new LogService();
+ls.OnMessage.connect(function(level, ...args){
+    const outFunc = {
+        1: console.error,
+        2: console.warn,
+        3: console.log,
+        4: console.info
+    };
+    outFunc[level](...args);
+});
+let dbs = new DbService(ls);
+let ts = new TwitchService(ls, dbs);
+
+// create the public controllers and the endpoints that access their methods
+let appController = new AppController(ls, dbs, ts);
+let authController = new AuthController(ls, ts);
+let eventsController = new EventsController(ls, dbs, ts);
+let appRouter = createAppRouter(appController);
+let authRouter = createAuthRouter("auth", authController);
+let eventsRouter = createEventsRouter(eventsController);
+let rootRouter = createRootRouter();
+
 
 // configure the local server
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// it is important that this middleware be installed at the end of all app initialization.
+// it acts as a final catch so that any route not handled will automatically return a 404
+//app.use(function(req, res, next){
+//    res.status(404).sendFile('public/error.404.html', { root: __dirname });
+//});
 
+// serve up static files for UI
+app.use(express.static(`public`));
 
 // connect the API
-app.use(`/app`, appRouter);
+app.use(rootRouter);
+app.use('/app', appRouter);
+app.use('/auth', authRouter);
 app.use('/events', eventsRouter);
 if (config.ENABLE_DEBUG_ENDPOINTS) {
     const createDebugRouter = require('./src/routes/debug.route.js');
     let debugRouter = createDebugRouter(dbs, ls, ts);
-    app.use(`/debug`, debugRouter);
+    app.use('/debug', debugRouter);
 }
-app.use(`/docs`, swaggerUi.serve, swaggerUi.setup(specs, {explorer:true}));
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(specs, {explorer:true}));
+
 
 
 
@@ -90,6 +104,7 @@ commands.onRun.connect(function(){
     // gracefully handle shutdowns
     process.on('SIGTERM', ()=>{
         dbs.close();
+        ts.close();
         app.close();
     });
 });
