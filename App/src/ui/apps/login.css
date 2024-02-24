@@ -1,0 +1,71 @@
+/* THIS IS A GENERATED FILE. ANY CHANGES TO THIS FILE WILL BE OVERWRITTEN */
+#root {
+  max-width: 800px;
+  margin: auto;
+}
+
+p {
+  text-align: center;
+}
+
+@media (prefers-color-scheme: light) {
+  h1 {
+    color: #595959;
+    text-align: center;
+  }
+  .loginapp-submit {
+    color: #131018;
+    background: #554d00;
+    border-color: #807615;
+    border-radius: 20px;
+    margin: 30px auto;
+    width: 300px;
+    height: 40px;
+    font-size: 24px;
+    font-weight: bold;
+    display: table;
+  }
+  .loginapp-submit:hover {
+    color: black;
+    background: black;
+    border-color: #282507;
+    border-radius: 20px;
+    margin: 30px auto;
+    width: 300px;
+    height: 40px;
+    font-size: 24px;
+    font-weight: bold;
+    display: table;
+  }
+}
+@media (prefers-color-scheme: dark) {
+  h1 {
+    color: #7D6a95;
+    text-align: center;
+  }
+  .loginapp-submit {
+    color: #45325e;
+    background: #d4cb6a;
+    border-color: #aaa039;
+    border-radius: 20px;
+    margin: 30px auto;
+    width: 300px;
+    height: 40px;
+    font-size: 24px;
+    font-weight: bold;
+    display: table;
+  }
+  .loginapp-submit:hover {
+    color: #140f1b;
+    background: #a89e30;
+    border-color: #5e581f;
+    border-radius: 20px;
+    margin: 30px auto;
+    width: 300px;
+    height: 40px;
+    font-size: 24px;
+    font-weight: bold;
+    display: table;
+  }
+}
+

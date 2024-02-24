@@ -1,25 +1,26 @@
 import React from 'react';
+import "./scopeGroup.css";
 
-export default function scopeGroup(props) {
+export default function ScopeGroup(props) {
 	let permission = props.permission;
 	let eventList = props.events;
 
 	// eventData : 
 	// - name
 	// - description
-	// 
 	let boxes = eventList.map((eventData) =>
-		<React.Fragment>
-			<input type="checkbox" name="{eventData.name}" checked/>
-			<label for="{eventData.name}">
-				<span class="scope-title">{eventData.name}</span> - {eventData.description}
+		<div class="scope-group-item">
+			<input class="scope-group-input" type="checkbox" name="{eventData.name}" checked/>
+			<label class="scope-group-label" for="{eventData.name}">
+				<span class="scope-group-title">{eventData.name}</span>
+				<span class="scope-group-description">{eventData.description}</span>
 			</label>
-		</React.Fragment>
+		</div>
 	);
 
 	return (
 		<div class="scope-group">
-			<h3>these are a scope group</h3>
+			<h3>{permission}</h3>
 			{boxes}
 		</div>
 	);

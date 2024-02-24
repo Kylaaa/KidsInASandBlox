@@ -1,66 +1,60 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 
-let ScopeGroup = require('../components/scopeGroup.js');
+import "./login.css";
+import ScopeGroup from '../components/scopeGroup.js';
 
-function LoginApp(props) {
-	let submissionUrl = props.submissionUrl;
-	let eventData = props.eventData;
-
-	console.log(submissionUrl, eventData);
-
-	// transform the event data
-	let permissions = {};
-	// example) "channel.follow" : {"name":"channel.follow","description":"","version":1,"scope":"","condition":["broadcaster_user_id"]}
-	eventsData.forEach((event) => {
-		if (!permissions[event.scope]) {
-			permissions[event.scope] = [];
+class LoginApp extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			eventData : {}
 		}
+	}
 
-		permissions[event.scope].push(event);
-	})
+	componentDidMount() {
+		// pull down configuration
+		var req = new XMLHttpRequest();
+		req.open("GET", this.props.configUrl, true);
+		req.onreadystatechange = ()=>{
+			if (req.readyState === XMLHttpRequest.DONE) {
+				let response = JSON.parse(req.responseText);
+				this.setState({
+					eventData : response.eventData
+				});
+			}
+		};
+		req.send();
+	}
 
-	let scopes = [];
-	for (let [permission, events] of Object.entries(permissions)) {
-		scopes.insert(<ScopeGroup
-			permission = 
-		></ScopeGroup>);
-	})
+	render() {
+		let submissionUrl = this.props.submissionUrl;
+		let eventData = this.state.eventData;
 
-	return (
-		<React.Fragment>
-			<h1> What events would you like to observe? </h1>
-			<p> In order to subscribe to events, certain permissions are required. Each event can be found inside the permission required for it. </p>
-			<form action={submissionUrl}>
-				<div class="scope-group">
-					<h3>these are a scope group</h3>
-					<input type="checkbox" name="test" checked/>
-					<label for="test">this is a </label>
-				</div>
-				<input type="submit" value="Submit" />
-			</form>
-		</React.Fragment>
-	);
+		let scopes = Object.keys(eventData).map((key, index) => (
+			<ScopeGroup
+				permission = { key === "" ? "No Permissions Required" : key }
+				events = { eventData[key] }
+			/>
+		));
+
+		// TODO : read up on Forms special cases : https://legacy.reactjs.org/docs/forms.html
+		return (
+			<React.Fragment>
+				<h1> What events would you like to observe? </h1>
+				<p> In order to subscribe to events, certain permissions are required. Each event can be found inside the permission required for it. </p>
+				<form action={submissionUrl}>
+					{scopes}
+					<input class="loginapp-submit" type="submit" value="Log In With Twitch..." />
+				</form>
+			</React.Fragment>
+		);
+	}
 }
 
-//let [eventData, updateEventData] = useState([]);
-
-// pull down configuration
-var req = new XMLHttpRequest();
-req.open("GET", `http://localhost:3000/auth/login/config`, true);
-req.onreadystatechange = ()=>{
-	if (req.readyState === XMLHttpRequest.DONE) {
-		console.log(req.responseText);
-		let response = JSON.parse(req.responseText);
-		//updateEventData(response.eventData);
-	}
-};
-req.send();
-
-
-const domNode = document.getElementById('root');
-const root = ReactDOM.createRoot(domNode);
+let domNode = document.getElementById('root');
+let root = ReactDOM.createRoot(domNode);
 root.render(<LoginApp
 	submissionUrl="http://localhost:3000/auth/login"
-	eventData={[]} //{eventData}
+	configUrl="http://localhost:3000/auth/login/config"
 />);

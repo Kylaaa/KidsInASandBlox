@@ -14,7 +14,7 @@ function createRoutes(routePath, authController) {
     // WHEN FUNCTIONS ARE PASSED TO HIGHER ORDER FUNCTIONS, THE
     // 'this' KEYWORD LOSES SCOPE AND BECOMES UNDEFINED.
     // DO NOT PASS RAW CLASS FUNCTIONS TO THE ROUTER
-    router.get('/login/config', (req, res)=> authController.getLoginConfiguration(req, res));
+    router.get('/login/config', (req, res)=> authController.getLoginPageConfiguration(req, res));
     router.get('/login',        (req, res)=> authController.loginUI(req, res));
     router.post('/login',       (req, res)=> authController.login(req, res));
     router.get('/handleLogin',  (req, res)=> authController.authenticate(`/${routePath}/setToken`, req, res));

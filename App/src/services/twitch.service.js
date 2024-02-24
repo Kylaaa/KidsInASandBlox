@@ -62,6 +62,19 @@ class TwitchService {
     getTwitchEventData(){
         return twitchEventData;
     }
+    getTwitchEventDataByScope() {
+        // example) "channel.follow" : {"name":"channel.follow","description":"","version":1,"scope":"","condition":["broadcaster_user_id"]}
+        let scopes = {}; // <permission-name, array<eventData>>
+        for (let [name, event] of Object.entries(twitchEventData)) {
+            if (scopes[event.scope] === undefined) {
+                scopes[event.scope] = [];
+            }
+
+            scopes[event.scope].push(event);
+        };
+
+        return scopes
+    }
 
     subscribe(userId, eventName) {
         let name = eventData.name

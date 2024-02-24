@@ -10,11 +10,11 @@ class AuthController {
 		this.#dependencies['twitch'] = twitchService;
 	}
 
-	getLoginConfiguration(request, response, next) {
+	getLoginPageConfiguration(request, response, next) {
 		let ts = this.#dependencies['twitch'];
 
 		response.json({
-			eventData : ts.getTwitchEventData()
+			eventData : ts.getTwitchEventDataByScope()
 		});
 	}
 

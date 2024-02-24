@@ -1,0 +1,14 @@
+@use 'colors';
+
+@mixin createTheme($scheme, $themeTable) {
+	@media (prefers-color-scheme: $scheme) {
+		body {
+			background-color: map-get($themeTable, $scheme, "primary1");
+			color: map-get($themeTable, $scheme, "secondary1");
+		}
+	}
+}
+
+// create all of the themes
+@include createTheme("light", colors.$themes);
+@include createTheme("dark",  colors.$themes);

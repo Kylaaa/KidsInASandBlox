@@ -1,0 +1,35 @@
+// create a color palette
+$grey1: #131018;
+$grey2: #595959;
+$grey3: #807d85;
+$grey4: #d1d0d3;
+
+$purple1: #321e4d;
+$purple2: #45325e;
+$purple3: #7D6a95;
+$purple4: #a89ab9;
+
+$yellow1: #554d00;
+$yellow2: #807615;
+$yellow3: #aaa039;
+$yellow4: #d4cb6a;
+
+// define themes
+$themes:(
+	light: (
+		primary1: $grey4,
+		primary2: $grey3,
+		secondary1: $grey1,
+		secondary2: $grey2,
+		tertiary1: $yellow1,
+		tertiary2: $yellow2
+	),
+	dark: (
+		primary1: $grey1,
+		primary2: $grey2,
+		secondary1: $purple2,
+		secondary2: $purple3,
+		tertiary1: $yellow4,
+		tertiary2: $yellow3
+	)
+);

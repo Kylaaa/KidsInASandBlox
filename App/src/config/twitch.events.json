@@ -1,70 +1,80 @@
 {
 	"channel.follow" : {
-		"name" : "channel.follow",
-		"description" : "",
+		"id" : "channel.follow",
+		"name" : "Follow",
+		"description" : "A channel receives a follow.",
 		"version" : 1,
 		"scope" : "",
 		"condition" : [ "broadcaster_user_id" ]
 	},
 	"channel.subscribe" : {
-		"name" : "channel.subscribe",
-		"description" : "",
+		"id" : "channel.subscribe",
+		"name" : "Subscribe",
+		"description" : "A specified channel receives a subscriber. This does not include resubscribes.",
 		"version" : 1,
 		"scope" : "channel:read:subscriptions",
 		"condition" : [ "broadcaster_user_id" ]
 	},
 	"channel.subscription.gift" : {
-		"name" : "channel.subscription.gift",
-		"description" : "",
+		"id" : "channel.subscription.gift",
+		"name" : "Gift Subscription",
+		"description" : "A viewer gives a gift subscription to one or more users in the channel.",
 		"version" : 1,
 		"scope" : "channel:read:subscriptions",
 		"condition" : [ "broadcaster_user_id" ]
 	},
 	"channel.subscription.message" : {
-		"name" : "channel.subscription.message",
-		"description" : "",
+		"id" : "channel.subscription.message",
+		"name" : "Message Subscription",
+		"description" : "A user sends a resubscription chat message in a specific channel.",
 		"version" : 1,
 		"scope" : "channel:read:subscriptions",
 		"condition" : [ "broadcaster_user_id" ]
 	},
 	"channel.cheer": {
-		"name" : "channel.cheer",
-		"description" : "",
+		"id" : "channel.cheer",
+		"name" : "Cheer",
+		"description" : "A user cheers on the specified channel.",
 		"version" : 1,
 		"scope" : "bits:read",
 		"condition" : [ "broadcaster_user_id" ]
 	},
 	"channel.raid": {
-		"name" : "channel.raid",
-		"description" : "",
+		"id" : "channel.raid",
+		"name" : "Raid",
+		"description" : "A broadcaster raids another broadcaster’s channel.",
 		"version" : 1,
 		"scope" : "",
 		"condition" : [ "to_broadcaster_user_id" ]
 	},
 	"channel.hype_train.begin": {
-		"name" : "channel.hype_train.begin",
-		"description" : "",
+		"id" : "channel.hype_train.begin",
+		"name" : "Hype Train Begins",
+		"description" : "A Hype Train begins on the specified channel.",
 		"version" : 1,
 		"scope" : "channel:read:hype_train",
 		"condition" : [ "broadcaster_user_id" ]
 	},
 	"channel.hype_train.progress": {
-		"name" : "channel.hype_train.progress",
-		"description" : "",
+		"id" : "channel.hype_train.progress",
+		"name" : "Hype Train Progress",
+		"description" : "A Hype Train makes progress on the specified channel.",
 		"version" : 1,
 		"scope" : "channel:read:hype_train",
 		"condition" : [ "broadcaster_user_id" ]
 	},
 	"channel.hype_train.end": {
-		"name" : "channel.hype_train.end",
-		"description" : "",
+		"id" : "channel.hype_train.end",
+		"name" : "Hype Train Ends",
+		"description" : "A Hype Train ends on the specified channel.",
 		"version" : 1,
 		"scope" : "channel:read:hype_train",
 		"condition" : [ "broadcaster_user_id" ]
 	},
 	"channel.channel_points_custom_reward_redemption.add": {
-		"name" : "channel.channel_points_custom_reward_redemption.add",
-		"description" : "",
+		"id" : "channel.channel_points_custom_reward_redemption.add",
+		"name" : "Redeem Channel Points",
+		"description" : "A viewer has redeemed a custom channel points reward on the specified channel.",
 		"version" : 1,
 		"scope" : "channel:read:redemptions",
 		"condition" : [ "broadcaster_user_id" ]
