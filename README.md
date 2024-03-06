@@ -63,9 +63,9 @@ Option 2) Import directly into your project
 Minimum Viable Product
 - [✔️] Library interface standardized
 - [✔️] Library connects to localhost server
-- [In Progress] Localhost server Authenticates with Twitch
+- [✔️] Localhost server Authenticates with Twitch
 - [In Progress] Localhost server observes cheers and donation events and stores the information
-- [In Progress] Localhost server API standardized
+- [✔️] Localhost server API standardized
 - [❌] Roblox Studio Plugin logs observed events
 
 Expected Polish Before Release
