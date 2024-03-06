@@ -67,8 +67,10 @@ function createRoutes(eventsController) {
     // WHEN FUNCTIONS ARE PASSED TO HIGHER ORDER FUNCTIONS, THE
     // 'this' KEYWORD LOSES SCOPE AND BECOMES UNDEFINED.
     // DO NOT PASS RAW CLASS FUNCTIONS TO THE ROUTER
-    router.get('/all',      async (req, res)=> await eventsController.all(req, res));
-    router.get('/between',  async (req, res)=> await eventsController.between(req, res));
+    router.get(`/all`,          async (req, res)=> await eventsController.all(req, res));
+    router.get(`/between`,      async (req, res)=> await eventsController.between(req, res));
+    router.post(`/connect`,     async (req, res)=> await eventsController.connectToTwitch(req, res));
+    router.post(`/subscribe`,   async (req, res)=> await eventsController.subscribeToAll(req, res));
 
     return router;
 }

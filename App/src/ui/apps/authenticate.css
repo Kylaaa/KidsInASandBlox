@@ -1,19 +1,18 @@
 /* THIS IS A GENERATED FILE. ANY CHANGES TO THIS FILE WILL BE OVERWRITTEN */
-#root {
-  max-width: 800px;
-  margin: auto;
+p {
+  text-align: center;
 }
 
 @media (prefers-color-scheme: light) {
-  body {
-    background-color: #d1d0d3;
-    color: #131018;
+  h1 {
+    color: #595959;
+    text-align: center;
   }
 }
 @media (prefers-color-scheme: dark) {
-  body {
-    background-color: #131018;
-    color: #45325e;
+  h1 {
+    color: #7D6a95;
+    text-align: center;
   }
 }
 

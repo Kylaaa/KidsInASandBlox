@@ -1,10 +1,19 @@
+const fs = require('fs');
 const path = require('path');
 const webpack = require('webpack');
 
+let uiAppsPath = path.resolve(__dirname, './src/ui/apps');
+let extension = ".jsx"
+let appNames = fs.readdirSync(uiAppsPath).filter((name)=> name.substring(name.length - extension.length) == extension);
+
+let fileEntries = {};
+appNames.forEach((fileName)=>{
+    let key = fileName.substring(0, fileName.length - extension.length);
+    fileEntries[key] = path.resolve(uiAppsPath, fileName);
+});
+
 module.exports = {
-    entry: {
-        login: path.resolve(__dirname, './src/ui/apps/login.js')
-    },
+    entry: fileEntries,
     output: {
         path: path.resolve(__dirname, './public'),
         filename: '[name]/app.js'
@@ -27,6 +36,9 @@ module.exports = {
             }
         ]
     },
+    //optimization: {
+    //   minimize: false
+    //},
     resolve: {
         extensions: ['.*', '.js', '.jsx']
     },

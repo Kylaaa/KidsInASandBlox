@@ -8,7 +8,7 @@ class signal {
 		this.name = name;
 	};
 
-	connect(callback) {
+	connect = (callback)=>{
 		const nextId = randomUUID();
 		this.callbacks[nextId] = callback;
 
@@ -19,7 +19,7 @@ class signal {
 		return disconnect;
 	};
 
-	fire(...args) {
+	fire = (...args)=>{
 		for (const [_, callback] of Object.entries(this.callbacks)) {
 			try {
 				callback(...args);

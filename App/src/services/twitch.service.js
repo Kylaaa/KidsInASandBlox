@@ -13,57 +13,123 @@ const twitchEventData = require('./../config/twitch.events.json');
 
 class TwitchService {
     #dependencies = {};
-    #authToken = "";
-    #wsClient = new twitchWSClient();
-    #expectedStateString = "";
-    #observedEventData = {};
+    #wsClient = null;
     #eventData = twitchEventData;
 
-    constructor(logsService, dbService) {
+    constructor(logsService, sessionService, dbService) {
         this.#dependencies['logs'] = logsService;
+        this.#dependencies['session'] = sessionService;
         this.#dependencies['db'] = dbService;
 
+        this.#wsClient = new twitchWSClient(logsService);
         this.#wsClient.onConnection.connect((connection)=>{
             logsService.trace("Connected to Twitch!");
         });
-        this.#wsClient.onMessage.connect((message)=>{
-            logsService.trace(`Received message from Twitch : ${message}`);
+        this.#wsClient.onMessage.connect((id, time, message)=>{
+            logsService.trace(`Received message from Twitch :${id} - ${message}`);
         });
         this.#wsClient.onError.connect((err)=>{
             logsService.error(`Received error from Twitch : ${message}`);
         });
         this.#wsClient.onClose.connect(()=>{
             logsService.trace(`Received close signal from Twitch`);
+            sessionService.sessionToken = null;
         });
     }
 
     close() {
         
     }
-    isAuthenticated() {
-        return this.#authToken != "";
-    }
-    isSocketConnected() {
-        return this.#wsClient.isConnected;
+
+    #assertAuthenticatedAndConnected() {
+        let ss = this.#dependencies['session'];
+
+        if (!ss.isAuthenticated()){
+            throw new Error("Cannot subscribe to events before logging in.");
+        }
+        if (!this.#wsClient.isConnected || !ss.isSocketConnected()) {
+            throw new Error("Cannot subscribe to events without a live web-socket connection.");
+        }
+        if (ss.userData === undefined) {
+            throw new Error("Cannot subscribe to events before fetching information about the current user.");
+        }
     }
 
     #getRequestHeaders() {
+        let ss = this.#dependencies['session'];
+
         return {
-            'Authorization' : 'Bearer ' + this.#authToken,
+            'Authorization' : `Bearer ${ss.authToken}`,
             'Client-Id' : config.CLIENT_ID,
             'Content-Type' : "application/vnd.twitchtv.v5+json"
         }
     }
 
     #getConditionData(eventName) {
+        let ls = this.#dependencies['logs'];
+        let ss = this.#dependencies['session'];
 
+        let event = this.#eventData[eventName];
+        if (event === undefined) {
+            throw new Error(`Cannot find any information about ${eventName}`);
+        }
+
+        let conditionData = {};
+        event.condition.forEach((key)=>{
+            switch(key) {
+                case ('broadcaster_user_id') : 
+                    conditionData[key] = ss.userData.id;
+                    break;
+                case ('to_broadcaster_user_id') :
+                    conditionData[key] = ss.userData.id;
+                    break;
+                default :
+                    let msg = `Unhandled request regarding condition data for ${eventName} : ${key}`;
+                    ls.error(msg);
+                    throw new Error(msg);
+            }
+        });
+    }
+
+    createWSConnection() {
+        let ls = this.#dependencies['logs'];
+        let ss = this.#dependencies['session'];
+        let ws = this.#wsClient;
+
+        return new Promise((resolve, reject)=>{
+            var disconnectWelcomeCallback;
+            var disconnectErrCallback;
+            disconnectWelcomeCallback = ws.onWelcome.connect((id, time, payload)=>{
+                // todo : handle possible reconnect_url field
+
+                resolve(payload.session.id);
+                disconnectWelcomeCallback();
+                disconnectErrCallback();
+            });
+            disconnectErrCallback = ws.onError.connect((err)=>{
+                reject(err);
+                disconnectWelcomeCallback();
+                disconnectErrCallback();
+            });
+
+            try {
+                ws.start();
+            }
+            catch(e) {
+                disconnectErrCallback();
+                disconnectWelcomeCallback();
+                reject(e.message);
+            }
+        }).then((token)=>{
+            ls.trace(`Session token set to ${token}`);
+            ss.sessionToken = token;
+        });
     }
 
     getTwitchEventData(){
         return twitchEventData;
     }
     getTwitchEventDataByScope() {
-        // example) "channel.follow" : {"name":"channel.follow","description":"","version":1,"scope":"","condition":["broadcaster_user_id"]}
         let scopes = {}; // <permission-name, array<eventData>>
         for (let [name, event] of Object.entries(twitchEventData)) {
             if (scopes[event.scope] === undefined) {
@@ -76,45 +142,42 @@ class TwitchService {
         return scopes
     }
 
-    subscribe(userId, eventName) {
-        let name = eventData.name
+    subscribe(eventName) {
+        this.#assertAuthenticatedAndConnected();
+
+        let event = this.#eventData[eventName];
+        if (event === undefined) {
+            throw new Error(`Cannot subscribe to an event named ${eventName}.`);
+        }
+
+        let name = event.id;
+        if (name === undefined) {
+            throw new Error(`Event data for ${eventName} is missing an id.`);
+        }
+
+        let version = event.version;
+        if (version === undefined) {
+            throw new Error(`Event data for ${eventName} is missing a version number.`);
+        }
+
+        let headers = this.#getRequestHeaders();
+        let conditions = this.#getConditionData(eventName);
+
         return fetch("https://api.twitch.tv/helix/eventsub/subscriptions", {
             method: "POST",
-            headers: this.#getRequestHeaders(),
+            headers: headers,
             body: JSON.stringify({
                 type: name,
                 version: version,
-                condition: {
-                    user_id: userId
-                },
+                condition: conditions,
                 transport: {
                     method: "websocket"
-                }
+                },
+                session_id: ss.sessionToken
             })
-        })
-
-        /*
-        response :
-        {
-            data: [],
-            id: <string>,
-            status: <string>, // possible values : "enabled" "webhook_callback_verification_pending"
-            type : <string>,
-            version,
-            condition,
-            created_at,
-            transport,
-            method,
-            session_id,
-            connected_at
-        }
-
-        codes :
-        202 - Accepted
-        400 - Bad Request
-        */
+        });
     }
-    unsubscribe(userId, eventName) {
+    unsubscribe(eventName) {
         return fetch("https://api.twitch.tv/helix/eventsub/subscriptions", {
             method: "DELETE",
             headers: this.#getRequestHeaders(),
@@ -131,19 +194,23 @@ class TwitchService {
         })
     }
 
-    createOAuthWebview(scopes) {
-        this.#expectedStateString = uuidv4();
+    createOAuthLoginUrl(scopes, redirectUrl) {
+        let ss = this.#dependencies['session'];
+        ss.expectedStateString = uuidv4();
 
         // The redirct_uri must match one of the urls provided to the Developer Dashboard
         const args = {
             "response_type" : "token",
             "client_id" : config.CLIENT_ID,
-            "redirect_uri" : "http://localhost:3000/auth/handleLogin",
-            "scope" : scopes.join('+'),
-            "state" : this.#expectedStateString
+            "redirect_uri" : config.TWITCH_OAUTH_REDIRECT_URL,
+            "scope" : scopes.join(' '),
+            "state" : ss.expectedStateString
         };
+
         // the webview will redirect the the url specified in the 'redirect_url' argument
-        const targetUrl = constructUrl("https://id.twitch.tv/oauth2/authorize?", args);
+        return constructUrl("https://id.twitch.tv/oauth2/authorize?", args);
+    }
+    createOAuthWebview(targetUrl) {
         return webview.spawn({
             title : config.APP_NAME,
             width : config.LOGIN_VIEW_SIZE.WIDTH,
@@ -152,34 +219,16 @@ class TwitchService {
         });
     }
 
-    setAuthToken(stateString, token) {
-        let logger = this.#dependencies['logs'];
-        if (this.#expectedStateString != stateString) {
-            logger.error("Attempted to set auth token with invalid state. Expected ${}, but received ${}");
-            throw new Error("Attempted to set auth token with invalid state string.");
+    getUserId() {
+        let ss = this.#dependencies['session'];
+        if (!ss.isAuthenticated()) {
+            throw new Error("Cannot fetch user information before logging in.");
         }
-        this.#authToken = token;
-        logger.trace("Auth token set successfully!");
-    }
 
-    createWSConnection() {
-        this.#wsClient.start();
-    }
-
-    getUserId(userName) {
-        return fetch("https://api.twitch.tv/helix/users", {
+        // https://dev.twitch.tv/docs/api/reference/#get-users
+        return fetch(`https://api.twitch.tv/helix/users`, {
             method: "GET",
             headers: this.#getRequestHeaders(),
-            body: JSON.stringify({
-                type: name,
-                version: version,
-                condition: {
-                    user_id: userId
-                },
-                transport: {
-                    method: "websocket"
-                },
-            })
         });
     }
 }

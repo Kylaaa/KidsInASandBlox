@@ -36,12 +36,9 @@ class dbService {
             });
         }
 
-        let fields = [
-            "id INTEGER PRIMARY KEY AUTOINCREMENT",
-            "data TEXT",
-            "received_date DATETIME DEFAULT CURRENT_TIMESTAMP",
-        ]
-        db.run(`CREATE TABLE events (${fields.toString()})`);
+        for (let [name, fields] of Object.entries(dbConfig.TABLE_SCHEMAS)) {
+            db.run(`CREATE TABLE ${name} (${fields.toString()})`);
+        }
 
         return db;
     }
@@ -118,6 +115,43 @@ class dbService {
             });
         });
     }
+
+
+    setObservedEvents(eventNames) {
+        return new Promise((resolve, reject)=>{
+            let insertQuery = "INSERT INTO subscriptions (name) VALUES (?)";
+            this.#db.run(insertQuery, eventNames.toString(), (err)=>{
+                if (err) {
+                    let logger = this.#dependencies['logs'];
+                    logger.error(`Threw an error while adding an event (${JSON.stringify(eventData)}) : `, err);
+                    reject(err);
+                }
+                else {
+                    resolve();
+                }
+            });
+        });
+    }
+    getObservedEvents() {
+        return new Promise((resolve, reject) => {
+            let selectQuery = "SELECT name FROM subscriptions ORDER BY name ASC";
+            return this.#db.all(selectQuery, (err, rows)=>{
+                if (err) {
+                    let logger = this.#dependencies['logs'];
+                    logger.error("Threw an error while getting all subscribed event names : ", err);
+                    reject(err);
+                }
+                else {
+                    let cleanedData = [];
+                    for (let [i, dataObj] of Object.entries(rows)) {
+                        cleanedData[i] = dataObj['name'];
+                    }
+                    resolve(cleanedData);
+                }
+            });
+        });
+    }
+
 
     close() {
         this.#db.close();

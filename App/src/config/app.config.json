@@ -3,7 +3,6 @@
     "PUBLIC_PORT" : 3000,
     "VERSION" : "1.0.0",
     "CLIENT_ID" : "yj5phjmty3v747fr6lfnbzyzdptplw",
-    "CLIENT_SECRET" : "",
 
     "LOGIN_VIEW_SIZE" : {
         "WIDTH" : 600,
@@ -13,9 +12,8 @@
     "LOG_LEVEL" : 4,
     "ENABLE_DEBUG_ENDPOINTS" : true,
 
-    "CLEAR_DATABASE_ON_START" : true,
-
-    "TWITCH_WS_HOST" : "wss://eventsub-beta.wss.twitch.tv/ws",
+    "TWITCH_OAUTH_REDIRECT_URL" : "http://localhost:3000/auth/process-login",
+    "TWITCH_WS_HOST" : "wss://eventsub.wss.twitch.tv/ws",
     "TWICH_WS_PROTOCOL" : "echo-protocol",
     "TWITCH_SUBSCRIPTION_METHOD" : "websocket",
 

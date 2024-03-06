@@ -17,6 +17,7 @@ const createRootRouter = require('./src/routes/root.route.js');
 const DbService = require('./src/services/db.service.js');
 const EventsController = require('./src/controllers/events.controller.js');
 const LogService = require('./src/services/logs.service.js');
+const SessionService = require('./src/services/session.service.js');
 const TwitchService = require('./src/services/twitch.service.js');
 
 // construct the docs
@@ -53,14 +54,15 @@ ls.OnMessage.connect(function(level, ...args){
     outFunc[level](...args);
 });
 let dbs = new DbService(ls);
-let ts = new TwitchService(ls, dbs);
+let ss = new SessionService(ls);
+let ts = new TwitchService(ls, ss, dbs);
 
 // create the public controllers and the endpoints that access their methods
 let appController = new AppController(ls, dbs, ts);
-let authController = new AuthController(ls, ts);
-let eventsController = new EventsController(ls, dbs, ts);
+let authController = new AuthController(ls, ss, ts);
+let eventsController = new EventsController(ls, dbs, ss, ts);
 let appRouter = createAppRouter(appController);
-let authRouter = createAuthRouter("auth", authController);
+let authRouter = createAuthRouter(authController);
 let eventsRouter = createEventsRouter(eventsController);
 let rootRouter = createRootRouter();
 
@@ -69,12 +71,6 @@ let rootRouter = createRootRouter();
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-
-// it is important that this middleware be installed at the end of all app initialization.
-// it acts as a final catch so that any route not handled will automatically return a 404
-//app.use(function(req, res, next){
-//    res.status(404).sendFile('public/error.404.html', { root: __dirname });
-//});
 
 // serve up static files for UI
 app.use(express.static(`public`));
@@ -111,6 +107,7 @@ commands.onRun.connect(function(){
 
 commands.onLogin.connect(function(){
     ls.message("Logging in...");
+    ts.createOAuthWebview(`http://localhost:${config.PUBLIC_PORT}/auth/login`);
 });
 
 commands.onLogout.connect(function(){

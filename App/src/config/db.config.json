@@ -1,5 +1,18 @@
 {
-	"VERBOSE_DEBUGGING" : true,
-	"PATH_TO_DB" : ":memory:",
-	"DB_MODE" : "OPEN_READWRITE | OPEN_CREATE | OPEN_FULLMUTEX"
+    "VERBOSE_DEBUGGING" : true,
+    "PATH_TO_DB" : ":memory:",
+    "DB_MODE" : "OPEN_READWRITE | OPEN_CREATE | OPEN_FULLMUTEX",
+
+    "TABLE_SCHEMAS" : {
+        "events": [
+            "id INTEGER PRIMARY KEY AUTOINCREMENT",
+            "data TEXT",
+            "received_date DATETIME DEFAULT CURRENT_TIMESTAMP"
+        ],
+
+        "subscriptions" : [
+            "id INTEGER PRIMARY KEY AUTOINCREMENT",
+            "name TEXT"
+        ]
+    }
 }

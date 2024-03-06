@@ -1,15 +1,14 @@
-@use 'colors';
+@use '../colors';
 
-#root {
-	max-width: 800px;
-	margin: auto;
+p {
+	text-align: center;
 }
 
 @mixin createTheme($scheme, $themeTable) {
 	@media (prefers-color-scheme: $scheme) {
-		body {
-			background-color: map-get($themeTable, $scheme, "primary1");
-			color: map-get($themeTable, $scheme, "secondary1");
+		h1 {
+			color: map-get($themeTable, $scheme, "secondary2");
+			text-align: center;
 		}
 	}
 }
