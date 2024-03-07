@@ -18,8 +18,10 @@
   "main": "index.js",
   "scripts": {
     "build": "powershell ./build/build.ps1",
+    "buildAndRun": "powershell ./build/buildAndRun.ps1",
     "run": "powershell ./build/run.ps1",
-    "make": "powershell ./build/compileAndRun.ps1",
+    "mock": "powershell ./build/mockTwitch.ps1",
+    "debug": "powershell ./build/debug.ps1",
     "test": "npx test"
   },
   "author": "Kyler Mulherin",

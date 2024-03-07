@@ -6,7 +6,6 @@
  */
 
 const express = require('express');
-const config = require('./../config/app.config.json');
 
 function createRoutes(authController) {
     const router = express.Router();

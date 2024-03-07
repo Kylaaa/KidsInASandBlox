@@ -4,11 +4,36 @@ p {
 	text-align: center;
 }
 
+@mixin loginapp-submit-base {
+	border-radius:20px;
+	margin: 30px auto;
+	width: 300px;
+	height: 40px;
+	font-size: 24px;
+	font-weight: bold;
+	display: table;
+}
+
 @mixin createTheme($scheme, $themeTable) {
 	@media (prefers-color-scheme: $scheme) {
 		h1 {
 			color: map-get($themeTable, $scheme, "secondary2");
 			text-align: center;
+		}
+
+		.loginapp-submit {
+			color: map-get($themeTable, $scheme, "secondary1");
+			background: map-get($themeTable, $scheme, "tertiary1");
+			border-color: map-get($themeTable, $scheme, "tertiary2");
+
+			@include loginapp-submit-base;
+		}
+		.loginapp-submit:hover {
+			color: darken(map-get($themeTable, $scheme, "secondary1"), 20%);
+			background: darken(map-get($themeTable, $scheme, "tertiary1"), 20%);
+			border-color: darken(map-get($themeTable, $scheme, "tertiary2"), 20%);
+
+			@include loginapp-submit-base;
 		}
 	}
 }

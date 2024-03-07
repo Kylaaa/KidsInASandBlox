@@ -1,5 +1,4 @@
 const assert = require('assert');
-const config = require('./../config/app.config.json');
 const signal = require('./../utils/signal.js');
 
 const LOG_LEVEL = {
@@ -13,11 +12,17 @@ const LOG_LEVEL = {
 class logService {
 	static LEVEL = LOG_LEVEL;
 
+	#dependencies = {};
 	OnMessage = new signal("OnMessage"); // (int, ...<any>)=>()
 
+	constructor(configService) {
+		this.#dependencies['config'] = configService;
+	}
+
 	log(level, ...args) {
+		let config = this.#dependencies['config'];
 		assert(level != LOG_LEVEL.NONE);
-		if (config.LOG_LEVEL >= level) {
+		if (config.getAppConfig("LOG_LEVEL") >= level) {
 			this.OnMessage.fire(level, ...args);
 		}
 	}

@@ -1,5 +1,5 @@
 // holds onto relevant session information that controllers can reference
-class SessionService {
+class sessionService {
 	#dependencies = {};
 
 	authToken = null;
@@ -50,4 +50,4 @@ class SessionService {
 }
 
 
-module.exports = SessionService;
+module.exports = sessionService;

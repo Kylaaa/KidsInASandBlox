@@ -2,7 +2,6 @@
 	A web socket client to listen for messages from Twitch
 */
 
-const config = require('./../config/app.config.json')
 const signal = require('./signal.js');
 const WebSocketClient = require('websocket').client;
 
@@ -20,10 +19,11 @@ class twitchWebsocketClient {
 	#client = new WebSocketClient();
 	#isConnected = false;
 	#sessionId = null;
-	#logService = null;
+	#dependencies = {};
 
-	constructor(logService) {
-		this.#logService = logService;
+	constructor(configService, logService) {
+		this.#dependencies['config'] = configService;
+		this.#dependencies['logs'] = logService;
 
 		this.#client.on('connect', (connection)=>{
 			this.#connection = connection;
@@ -40,7 +40,7 @@ class twitchWebsocketClient {
 			});
 
 			connection.on('message', (message)=>{
-				let ls = this.#logService;
+				let ls = this.#dependencies['logs'];
 
 				let msgarr = ["Received message..."];
 				for (let [key, val] of Object.entries(message)){
@@ -137,12 +137,15 @@ class twitchWebsocketClient {
 	}
 
 	start() {
-		this.#logService.trace("Starting WS Connection with Twitch...");
+		let config = this.#dependencies['config'];
+		let ls = this.#dependencies['logs'];
+		 
+		ls.trace("Starting WS Connection with Twitch...");
 		if (this.#isConnected) {
 			throw new Error("Already connected, cannot connect again!");
 			return;
 		}
-		this.#client.connect(config.TWITCH_WS_HOST, config.TWITCH_WS_PROTOCOL);
+		this.#client.connect(config.getAppConfig("TWITCH_WS_HOST"), config.getAppConfig("TWITCH_WS_PROTOCOL"));
 	}
 }
 

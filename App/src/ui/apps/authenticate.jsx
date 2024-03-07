@@ -48,7 +48,7 @@ class ProcessLoginApp extends React.Component {
 
 		this.initSession = ()=>{
 			let initUrl = props.initSessionUrl;
-			return fetch(initUrl).then(()=>{
+			return fetch(initUrl).then((response)=>{
 				return response.json();
 			});
 		};
@@ -58,6 +58,8 @@ class ProcessLoginApp extends React.Component {
 			let connectUrl = props.connectUrl;
 			return fetch(connectUrl, {
 				method: 'POST'
+			}).then((response)=>{
+				return response.json();
 			});
 		};
 
@@ -66,6 +68,8 @@ class ProcessLoginApp extends React.Component {
 			let subscribeUrl = props.subscribeUrl;
 			return fetch(subscribeUrl, {
 				method: 'POST'
+			}).then((response)=>{
+				return response.json();
 			});
 		};
 
@@ -82,16 +86,16 @@ class ProcessLoginApp extends React.Component {
 				});
 
 				this.requests[this.currentRequest]().then((response)=>{
-					if (response.ok) {
+					if (response.success) {
 						console.log("... Incrementing request counter and resolving...");
 						this.currentRequest++;
 						resolve();
 					}
 					else {
-						console.log("... Request resolved with non-200 code : ", r.body);
+						console.log("... Request resolved with non-200 code : ", response.message);
 						this.setState({
 							isLoading : false,
-							errMessage : r.body
+							errMessage : response.message
 						});
 						reject();
 					}
@@ -123,7 +127,7 @@ class ProcessLoginApp extends React.Component {
 				<React.Fragment>
 					<h1>{errMessage}</h1>
 					<form action={retryFunction}>
-						<input type="submit" value="Retry" />
+						<input class="loginapp-submit" type="submit" value="Retry" />
 					</form>
 				</React.Fragment>
 			);
@@ -132,9 +136,9 @@ class ProcessLoginApp extends React.Component {
 		this.currentRequest = 0;
 		this.requests = [
 			this.parseUrlArgs,
-			this.connectToTwitch,
-			this.fetchUserInfo,
-			this.subscribeToEvents
+			this.initSession
+			//this.connectToTwitch,
+			//this.subscribeToEvents
 		];
 	}
 

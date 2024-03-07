@@ -1,4 +1,3 @@
-const config = require('./../config/app.config.json');
 const createErrResponse = require('./../models/createErrorResponse.js');
 const path = require('node:path');
 
@@ -93,6 +92,7 @@ class AuthController {
 		try {
 			await ts.getUserId().then(
 				(userData)=>{
+					ls.trace(userData);
 					ss.userData = userData;
 
 					response.json({

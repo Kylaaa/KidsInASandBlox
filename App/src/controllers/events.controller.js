@@ -82,6 +82,7 @@ class EventsController {
 
         let successfulSubscriptions = 0;
         try {
+            ls.trace(ss.observedEvents);
             let allSubscriptionPromises = [];
             ss.observedEvents.forEach((eventName)=>{
                 let subPromise = ts.subscribe(eventName).then(
@@ -106,6 +107,7 @@ class EventsController {
             });
         }
         catch (e) {
+            ls.error(e);
             response.status(401).json(createErrResponse(e.message));
         }
     }

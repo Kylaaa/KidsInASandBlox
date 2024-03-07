@@ -1,27 +1,27 @@
 const sqlite3 = require('sqlite3')
-const appConfig = require('../config/app.config.json');
-const dbConfig = require('../config/db.config.json');
 
 class dbService {
     #dependencies = {};
     #db;
 
-    constructor(logsService) {
-        if (dbConfig.VERBOSE_DEBUGGING) {
-            sqlite3.verbose();
-        }
-
+    constructor(configService, logsService) {
+        this.#dependencies['config'] = configService;
         this.#dependencies['logs'] = logsService;
         this.#db = this.#getDb();
     }
 
     
     #getDb() {
+        let config = this.#dependencies['config'];
         let logger = this.#dependencies['logs'];
+
+        if (config.getDbConfig("VERBOSE_DEBUGGING")) {
+            sqlite3.verbose();
+        }
 
         // When PATH_TO_DB is ":memory:", an anonymous in-memory db is created.
         // Its contents are lost upon close
-        let db = new sqlite3.Database(dbConfig.PATH_TO_DB, dbConfig.DB_MODE, (err)=>{
+        let db = new sqlite3.Database(config.getDbConfig("PATH_TO_DB"), config.getDbConfig("DB_MODE"), (err)=>{
             if (err) {
                 logger.error(`DBService - threw an error while creating and connecting to the db :  ${err.toString()}`);
                 throw err;
@@ -30,13 +30,13 @@ class dbService {
             logger.message(`Connected to database`);
         });
 
-        if (dbConfig.VERBOSE_DEBUGGING) {
+        if (config.getDbConfig("VERBOSE_DEBUGGING")) {
             db.on('trace', (data)=>{
                 logger.trace(data);
             });
         }
 
-        for (let [name, fields] of Object.entries(dbConfig.TABLE_SCHEMAS)) {
+        for (let [name, fields] of Object.entries(config.getDbConfig("TABLE_SCHEMAS"))) {
             db.run(`CREATE TABLE ${name} (${fields.toString()})`);
         }
 

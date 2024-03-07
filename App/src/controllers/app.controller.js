@@ -1,4 +1,3 @@
-const config = require('./../config/app.config.json');
 const createErrResponse = require('./../models/createErrorResponse.js');
 
 

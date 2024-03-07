@@ -5,23 +5,23 @@
 const webview = require("webview");
 const uuidv4 = require('uuid').v4;
 
-const config = require('./../config/app.config.json');
 const constructUrl = require('./../utils/constructUrl.js');
 const signal = require('./../utils/signal.js');
 const twitchWSClient = require('./../utils/twitchWSClient.js');
 const twitchEventData = require('./../config/twitch.events.json');
 
-class TwitchService {
+class twitchService {
     #dependencies = {};
     #wsClient = null;
     #eventData = twitchEventData;
 
-    constructor(logsService, sessionService, dbService) {
+    constructor(configService, logsService, sessionService, dbService) {
+        this.#dependencies['config'] = configService;
         this.#dependencies['logs'] = logsService;
         this.#dependencies['session'] = sessionService;
         this.#dependencies['db'] = dbService;
 
-        this.#wsClient = new twitchWSClient(logsService);
+        this.#wsClient = new twitchWSClient(configService, logsService);
         this.#wsClient.onConnection.connect((connection)=>{
             logsService.trace("Connected to Twitch!");
         });
@@ -56,11 +56,12 @@ class TwitchService {
     }
 
     #getRequestHeaders() {
+        let config = this.#dependencies['config'];
         let ss = this.#dependencies['session'];
 
         return {
             'Authorization' : `Bearer ${ss.authToken}`,
-            'Client-Id' : config.CLIENT_ID,
+            'Client-Id' : config.getAppConfig("CLIENT_ID"),
             'Content-Type' : "application/vnd.twitchtv.v5+json"
         }
     }
@@ -89,6 +90,8 @@ class TwitchService {
                     throw new Error(msg);
             }
         });
+
+        return conditionData;
     }
 
     createWSConnection() {
@@ -143,6 +146,8 @@ class TwitchService {
     }
 
     subscribe(eventName) {
+        let config = this.#dependencies['config'];
+        let ss = this.#dependencies['session'];
         this.#assertAuthenticatedAndConnected();
 
         let event = this.#eventData[eventName];
@@ -163,7 +168,7 @@ class TwitchService {
         let headers = this.#getRequestHeaders();
         let conditions = this.#getConditionData(eventName);
 
-        return fetch("https://api.twitch.tv/helix/eventsub/subscriptions", {
+        return fetch(`${config.getAppConfig("TWITCH_API_HOST")}/eventsub/subscriptions`, {
             method: "POST",
             headers: headers,
             body: JSON.stringify({
@@ -175,34 +180,67 @@ class TwitchService {
                 },
                 session_id: ss.sessionToken
             })
+        }).then((response)=>{
+            if (response.ok) {
+                return response.json();
+            }
+
+            throw new Error(response.json());
         });
     }
     unsubscribe(eventName) {
-        return fetch("https://api.twitch.tv/helix/eventsub/subscriptions", {
+        let config = this.#dependencies['config'];
+        let ss = this.#dependencies['session'];
+        this.#assertAuthenticatedAndConnected();
+
+        let event = this.#eventData[eventName];
+        if (event === undefined) {
+            throw new Error(`Cannot subscribe to an event named ${eventName}.`);
+        }
+
+        let name = event.id;
+        if (name === undefined) {
+            throw new Error(`Event data for ${eventName} is missing an id.`);
+        }
+
+        let version = event.version;
+        if (version === undefined) {
+            throw new Error(`Event data for ${eventName} is missing a version number.`);
+        }
+
+        let headers = this.#getRequestHeaders();
+        let conditions = this.#getConditionData(eventName);
+
+        return fetch(`${config.getAppConfig("TWITCH_API_HOST")}/eventsub/subscriptions`, {
             method: "DELETE",
-            headers: this.#getRequestHeaders(),
+            headers: headers,
             body: JSON.stringify({
                 type: event,
                 version: version,
-                condition: {
-                    user_id: userId,
-                },
+                condition: conditions,
                 transport: {
                     method: "websocket"
                 }
             })
-        })
+        }).then((response)=>{
+            if (response.ok) {
+                return response.json();
+            }
+
+            throw new Error(response.json());
+        });
     }
 
     createOAuthLoginUrl(scopes, redirectUrl) {
+        let config = this.#dependencies['config'];
         let ss = this.#dependencies['session'];
         ss.expectedStateString = uuidv4();
 
         // The redirct_uri must match one of the urls provided to the Developer Dashboard
         const args = {
             "response_type" : "token",
-            "client_id" : config.CLIENT_ID,
-            "redirect_uri" : config.TWITCH_OAUTH_REDIRECT_URL,
+            "client_id" : config.getAppConfig("CLIENT_ID"),
+            "redirect_uri" : config.getAppConfig("TWITCH_OAUTH_REDIRECT_URL"),
             "scope" : scopes.join(' '),
             "state" : ss.expectedStateString
         };
@@ -211,27 +249,35 @@ class TwitchService {
         return constructUrl("https://id.twitch.tv/oauth2/authorize?", args);
     }
     createOAuthWebview(targetUrl) {
+        let config = this.#dependencies['config'];
         return webview.spawn({
-            title : config.APP_NAME,
-            width : config.LOGIN_VIEW_SIZE.WIDTH,
-            height : config.LOGIN_VIEW_SIZE.HEIGHT,
+            title : config.getAppConfig("APP_NAME"),
+            width : config.getAppConfig("LOGIN_VIEW_SIZE.WIDTH"),
+            height : config.getAppConfig("LOGIN_VIEW_SIZE.HEIGHT"),
             url : targetUrl
         });
     }
 
     getUserId() {
+        let config = this.#dependencies['config'];
         let ss = this.#dependencies['session'];
         if (!ss.isAuthenticated()) {
             throw new Error("Cannot fetch user information before logging in.");
         }
 
         // https://dev.twitch.tv/docs/api/reference/#get-users
-        return fetch(`https://api.twitch.tv/helix/users`, {
+        return fetch(`${config.getAppConfig("TWITCH_API_HOST")}/users`, {
             method: "GET",
             headers: this.#getRequestHeaders(),
+        }).then((response)=>{
+            if (response.ok) {
+                return response.json();
+            }
+
+            throw new Error(response.json());
         });
     }
 }
 
 
-module.exports = TwitchService;
+module.exports = twitchService;
