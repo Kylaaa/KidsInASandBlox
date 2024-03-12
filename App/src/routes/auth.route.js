@@ -3,7 +3,18 @@
  * tags:
  *  name: Auth
  *  description: Endpoints to authenticate the Twitch session
+ *
+ * /login:
+ *  get:
+ *    summary: Shows a page to authenticate your account with Twitch.
+ *    tags: [Auth]
+ *    responses:
+ *      200:
+ *        description: 
+ *        content:
+ *          html
  */
+
 
 const express = require('express');
 

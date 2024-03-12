@@ -42,7 +42,9 @@ function createDebugRoutes(dbService, logsService, twitchService) {
     });
 
     router.get(`auth/getUser`, async(req, res)=>{
-        twitchService.getUserId()
+        twitchService.getUserId().then((res)=>{
+            
+        });
     });
     router.get('events/subscribe', async(req, res)=>{
         twitchService

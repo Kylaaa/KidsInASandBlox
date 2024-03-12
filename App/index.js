@@ -37,7 +37,7 @@ let ss = new SessionService(cfs, ls);
 let ts = new TwitchService(cfs, ls, ss, dbs);
 
 // create the public controllers and the endpoints that access their methods
-let appController = new AppController(ls, dbs, ts);
+let appController = new AppController(ls, dbs, ss, ts);
 let authController = new AuthController(ls, ss, ts);
 let eventsController = new EventsController(ls, dbs, ss, ts);
 let appRouter = createAppRouter(appController);
