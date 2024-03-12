@@ -5,7 +5,7 @@ param(
 )
 
 $projectRoot = Resolve-Path -Path "$PSScriptRoot/../"
-$envFile = Get-Item -Path "$projectRoot/$env" | Resolve-Path -Relative
+$envFile = Get-Item -Path "$projectRoot/src/config/$env" | Resolve-Path -Relative
 $entryPoint = Get-Item -Path "$projectRoot/index.js"
 
 # run the localhost server

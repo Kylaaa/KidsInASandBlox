@@ -43,10 +43,10 @@ class LoginApp extends React.Component {
 		};
 
 		this.renderLoginForm = (submissionUrl, eventData)=>{
-			let scopes = Object.keys(eventData).map((key, index) => (
+			let scopes = Object.keys(eventData).map((permission, index) => (
 				<ScopeGroup
-					permission = { key === "" ? "No Permissions Required" : key }
-					events = { eventData[key] }
+					permission = { permission === "" ? "No Permissions Required" : permission }
+					events = { eventData[permission] }
 				/>
 			));
 

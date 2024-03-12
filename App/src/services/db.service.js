@@ -45,6 +45,7 @@ class dbService {
 
     
     addEvent(eventData) {
+        // TODO : protect against replay attacks by only inserting events whose event id are unique
         return new Promise((resolve, reject)=>{
             let insertQuery = "INSERT INTO events (data) VALUES (?)";
             this.#db.run(insertQuery, JSON.stringify(eventData), (err)=>{

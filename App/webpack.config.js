@@ -36,9 +36,9 @@ module.exports = {
             }
         ]
     },
-    //optimization: {
-    //   minimize: false
-    //},
+    optimization: {
+       minimize: true
+    },
     resolve: {
         extensions: ['.*', '.js', '.jsx']
     },

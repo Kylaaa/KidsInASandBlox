@@ -12,11 +12,16 @@
     "LOG_LEVEL" : 0,
     "ENABLE_DEBUG_ENDPOINTS" : false,
 
+    "ENFORCE_AUTHENTICATION_CHECKS" : true,
+
     "TWITCH_OAUTH_REDIRECT_URL" : "http://localhost:3000/auth/process-login",
     "TWITCH_WS_HOST" : "wss://eventsub.wss.twitch.tv/ws",
     "TWITCH_API_HOST" : "https://api.twitch.tv/helix",
     "TWICH_WS_PROTOCOL" : "echo-protocol",
     "TWITCH_SUBSCRIPTION_METHOD" : "websocket",
+    "TWITCH_MAX_SUBSCRIPTION_COUNT" : 300,
+    "TWITCH_MAX_SUBSCRIPTION_COST" : 10,
+
 
     "DOCUMENTATION_INFO" : {
         "openapi" : "3.1.0",

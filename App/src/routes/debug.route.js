@@ -1,20 +1,10 @@
 const express = require('express');
 
-const readme = "<html>" +
-    "<header>" +
-    "</header>" +
-    "<body>" +
-        "<h1>This is a test</h1>" +
-    "</body>" +
-"</html>";
 
 function createDebugRoutes(dbService, logsService, twitchService) {
     const router = express.Router();
-    router.get('/', (req, res)=>{
-        res.send(readme);
-    });
 
-    router.get('/addEvent', (req, res)=>{
+    router.get(`events/add`, (req, res)=>{
         dbService.addEvent({
             "subscription": {
                 "id": "f1c2a387-161a-49f9-a165-0f21d7a4e1c4",
@@ -46,9 +36,16 @@ function createDebugRoutes(dbService, logsService, twitchService) {
         res.json({ success : true, message : "debug event added" });
     });
 
-    router.get('/all', async(req, res)=>{
+    router.get(`events/all`, async(req, res)=>{
         let events = await dbService.getAllEvents();
         res.json({ success : true, events : events});
+    });
+
+    router.get(`auth/getUser`, async(req, res)=>{
+        twitchService.getUserId()
+    });
+    router.get('events/subscribe', async(req, res)=>{
+        twitchService
     });
 
     return router;

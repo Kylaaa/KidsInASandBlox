@@ -21,12 +21,13 @@ class sessionService {
       "created_at": "2016-12-14T20:32:28Z"
     }
 	*/
-	currentUserData = null;
+	userData = null;
 
 	observedEvents = [];
 	observedEventsRetry = [];
 
-	constructor(logsService) {
+	constructor(configService, logsService) {
+        this.#dependencies['config'] = configService;
 		this.#dependencies['logs'] = logsService;
 	}
 
@@ -42,7 +43,12 @@ class sessionService {
     }
 
     isAuthenticated() {
-    	return this.authToken != null;
+        let config = this.#dependencies['config'];
+        if (!config.getAppConfig("ENFORCE_AUTHENTICATION_CHECKS")) {
+            return true;
+        }
+
+        return this.authToken != null;
     }
     isSocketConnected() {
     	return this.sessionToken != null;

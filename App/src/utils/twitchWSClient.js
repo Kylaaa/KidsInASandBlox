@@ -42,12 +42,6 @@ class twitchWebsocketClient {
 			connection.on('message', (message)=>{
 				let ls = this.#dependencies['logs'];
 
-				let msgarr = ["Received message..."];
-				for (let [key, val] of Object.entries(message)){
-					msgarr.push(`${key} : ${val.toString()}`);
-				}
-				ls.trace(msgarr.join(`\n`));
-
 				if (message.type === 'utf8'){
 					let data = JSON.parse(message.utf8Data);
 					let id = data.metadata.message_id;
@@ -126,8 +120,13 @@ class twitchWebsocketClient {
 							break;
 					}
 				}
-
-				this.onMessage.fire(message);
+				else {
+					let msgarr = ["Unexpected ws message format received..."];
+					for (let [key, val] of Object.entries(message)){
+						msgarr.push(`${key} : ${val.toString()}`);
+					}
+					ls.trace(msgarr.join(`\n`));
+				}
 			});
 		});
 	}

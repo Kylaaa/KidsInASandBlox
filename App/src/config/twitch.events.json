@@ -3,9 +3,9 @@
         "id" : "channel.follow",
         "name" : "Follow",
         "description" : "A channel receives a follow.",
-        "version" : 1,
-        "scope" : "",
-        "condition" : [ "broadcaster_user_id" ]
+        "version" : 2,
+        "scope" : "moderator:read:followers",
+        "condition" : [ "broadcaster_user_id", "moderator_user_id" ]
     },
     "channel.subscribe" : {
         "id" : "channel.subscribe",

@@ -92,8 +92,8 @@ class AuthController {
 		try {
 			await ts.getUserId().then(
 				(userData)=>{
-					ls.trace(userData);
-					ss.userData = userData;
+					ls.trace(userData.data[0]);
+					ss.userData = userData.data[0];
 
 					response.json({
 						success : true,

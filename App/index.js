@@ -33,7 +33,7 @@ ls.OnMessage.connect(function(level, ...args){
     outFunc[level](...args);
 });
 let dbs = new DbService(cfs, ls);
-let ss = new SessionService(ls);
+let ss = new SessionService(cfs, ls);
 let ts = new TwitchService(cfs, ls, ss, dbs);
 
 // create the public controllers and the endpoints that access their methods

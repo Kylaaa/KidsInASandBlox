@@ -32,8 +32,13 @@
 
 @mixin createTheme($scheme, $themeTable) {
 	@media (prefers-color-scheme: $scheme) {
-		.scope-group h3 {
-			color: map-get($themeTable, $scheme, "secondary2");
+		.scope-group {
+			h3 {
+				color: map-get($themeTable, $scheme, "secondary2");
+			}
+			h3:hover {
+				color: darken(map-get($themeTable, $scheme, "secondary2"), 20%);
+			}
 		}
 
 		.scope-group-item {

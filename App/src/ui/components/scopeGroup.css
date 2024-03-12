@@ -32,6 +32,9 @@
   .scope-group h3 {
     color: #595959;
   }
+  .scope-group h3:hover {
+    color: #262626;
+  }
   .scope-group-item input {
     accent-color: #554d00;
   }
@@ -42,6 +45,9 @@
 @media (prefers-color-scheme: dark) {
   .scope-group h3 {
     color: #7D6a95;
+  }
+  .scope-group h3:hover {
+    color: #4b4059;
   }
   .scope-group-item input {
     accent-color: #d4cb6a;

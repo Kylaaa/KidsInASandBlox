@@ -13,8 +13,7 @@ class ProcessLoginApp extends React.Component {
 
 		this.gotoLogin = ()=>{
 			let loginUrl = props.loginUrl;
-			console.log("Going to login now!")
-			//window.location.href = loginUrl;
+			window.location.href = loginUrl;
 		};
 
 		this.parseUrlArgs = ()=>{
@@ -27,19 +26,16 @@ class ProcessLoginApp extends React.Component {
 				// - on a rejected authentication, parse out the query params
 				// ex) http://localhost:3000/?error=access_denied&error_description=The+user+denied+you+access&state=c3ab8aa609ea11e793ae92361f002671
 				if (window.location.search) {
-					console.log("incorrectly accessing the page with url args...")
 					this.gotoLogin();
 					reject();
 				}
 				else if (window.document.location.hash !== "") {
-					console.log("Sending the auth token...");
 					let hash = window.document.location.hash.substring(1);
 					fetch(setTokenUrl + "?" + hash).then((response)=>{
 						return response.json();
 					}).then(resolve);
 				}
 				else {
-					console.log("No auth token!")
 					this.gotoLogin();
 					reject();
 				}
@@ -54,7 +50,6 @@ class ProcessLoginApp extends React.Component {
 		};
 
 		this.connectToTwitch = ()=>{
-			console.log("Connecting to Twitch!");
 			let connectUrl = props.connectUrl;
 			return fetch(connectUrl, {
 				method: 'POST'
@@ -64,7 +59,6 @@ class ProcessLoginApp extends React.Component {
 		};
 
 		this.subscribeToEvents = ()=>{
-			console.log("Subscribing to Events!");
 			let subscribeUrl = props.subscribeUrl;
 			return fetch(subscribeUrl, {
 				method: 'POST'
@@ -74,7 +68,6 @@ class ProcessLoginApp extends React.Component {
 		};
 
 		this.fetchNextRequest = ()=>{
-			console.log("Fetching next request!", this.currentRequest, this.requests.length);
 			if (this.currentRequest >= this.requests.length) {
 				this.gotoLogin();
 				return;
@@ -87,12 +80,10 @@ class ProcessLoginApp extends React.Component {
 
 				this.requests[this.currentRequest]().then((response)=>{
 					if (response.success) {
-						console.log("... Incrementing request counter and resolving...");
 						this.currentRequest++;
 						resolve();
 					}
 					else {
-						console.log("... Request resolved with non-200 code : ", response.message);
 						this.setState({
 							isLoading : false,
 							errMessage : response.message
@@ -100,7 +91,6 @@ class ProcessLoginApp extends React.Component {
 						reject();
 					}
 				}, (err)=>{
-					console.log("... Failed request with error : ", err);
 					this.setState({
 						isLoading : false,
 						errMessage : err.message
@@ -108,8 +98,9 @@ class ProcessLoginApp extends React.Component {
 					reject();
 				});
 			}).then(()=>{
-				console.log("... recursing...");
 				return this.fetchNextRequest();
+			}).catch((err)=>{
+				// handle any rejected promises
 			});
 		};
 
@@ -126,9 +117,7 @@ class ProcessLoginApp extends React.Component {
 			return (
 				<React.Fragment>
 					<h1>{errMessage}</h1>
-					<form action={retryFunction}>
-						<input class="loginapp-submit" type="submit" value="Retry" />
-					</form>
+					<button class="loginapp-submit" onClick={retryFunction}>Retry</button>
 				</React.Fragment>
 			);
 		};
@@ -136,9 +125,9 @@ class ProcessLoginApp extends React.Component {
 		this.currentRequest = 0;
 		this.requests = [
 			this.parseUrlArgs,
-			this.initSession
-			//this.connectToTwitch,
-			//this.subscribeToEvents
+			this.initSession,
+			this.connectToTwitch,
+			this.subscribeToEvents
 		];
 	}
 

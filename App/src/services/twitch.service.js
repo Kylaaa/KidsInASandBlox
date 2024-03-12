@@ -27,6 +27,7 @@ class twitchService {
         });
         this.#wsClient.onMessage.connect((id, time, message)=>{
             logsService.trace(`Received message from Twitch :${id} - ${message}`);
+            dbService.addEvent(message);
         });
         this.#wsClient.onError.connect((err)=>{
             logsService.error(`Received error from Twitch : ${message}`);
@@ -62,7 +63,7 @@ class twitchService {
         return {
             'Authorization' : `Bearer ${ss.authToken}`,
             'Client-Id' : config.getAppConfig("CLIENT_ID"),
-            'Content-Type' : "application/vnd.twitchtv.v5+json"
+            'Content-Type' : "application/json"
         }
     }
 
@@ -84,6 +85,9 @@ class twitchService {
                 case ('to_broadcaster_user_id') :
                     conditionData[key] = ss.userData.id;
                     break;
+                case ('moderator_user_id') :
+                    conditionData[key] = ss.userData.id;
+                    break;
                 default :
                     let msg = `Unhandled request regarding condition data for ${eventName} : ${key}`;
                     ls.error(msg);
@@ -92,6 +96,14 @@ class twitchService {
         });
 
         return conditionData;
+    }
+
+    #getTransportData() {
+        let ss = this.#dependencies['session'];
+        return {
+            method: "websocket",
+            session_id: ss.sessionToken
+        }
     }
 
     createWSConnection() {
@@ -134,19 +146,30 @@ class twitchService {
     }
     getTwitchEventDataByScope() {
         let scopes = {}; // <permission-name, array<eventData>>
-        for (let [name, event] of Object.entries(twitchEventData)) {
-            if (scopes[event.scope] === undefined) {
-                scopes[event.scope] = [];
-            }
 
+        // sort the scopes before pushing events in
+        let sortedScopes = [];
+        for (let [name, event] of Object.entries(twitchEventData)) {
+            sortedScopes.push(event.scope);
+        }
+        sortedScopes.sort();
+        sortedScopes.forEach((name)=>{
+            if (scopes[name] === undefined) {
+                scopes[name] = [];
+            };
+        });
+
+        // insert all of the events into the "sorted" dictionary
+        for (let [name, event] of Object.entries(twitchEventData)) {
             scopes[event.scope].push(event);
         };
 
-        return scopes
+        return scopes;
     }
 
     subscribe(eventName) {
         let config = this.#dependencies['config'];
+        let ls = this.#dependencies['logs'];
         let ss = this.#dependencies['session'];
         this.#assertAuthenticatedAndConnected();
 
@@ -167,6 +190,7 @@ class twitchService {
 
         let headers = this.#getRequestHeaders();
         let conditions = this.#getConditionData(eventName);
+        let transport = this.#getTransportData();
 
         return fetch(`${config.getAppConfig("TWITCH_API_HOST")}/eventsub/subscriptions`, {
             method: "POST",
@@ -175,17 +199,21 @@ class twitchService {
                 type: name,
                 version: version,
                 condition: conditions,
-                transport: {
-                    method: "websocket"
-                },
-                session_id: ss.sessionToken
+                transport: transport
             })
         }).then((response)=>{
+            //ls.trace(response);
             if (response.ok) {
-                return response.json();
+                return response;
             }
 
-            throw new Error(response.json());
+            let details = [`Something went wrong subscribing to ${eventName}...`];
+            for (let [key, value] of Object.entries(response)) {
+                details.push(` - ${key} : ${value}`);
+            }
+            let message = details.join(`\n`);
+            ls.error(message);
+            throw new Error(message);
         });
     }
     unsubscribe(eventName) {
