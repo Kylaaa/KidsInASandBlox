@@ -1,13 +1,36 @@
+/**
+ * @swagger
+ * tags:
+ *  name: Debug
+ *  description: Endpoints regarding the state of the app
+ * /debug/events/add:
+ *  get:
+ *    summary: pushes a sample event to the database
+ *    tags: [Debug]
+ *    responses:
+ *      200:
+ *        description: 
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                success:
+ *                  type: boolean
+ *                message:
+ *                  type: string
+ */
+
 const express = require('express');
+const { randomUUID } = require('node:crypto');
 
 
 function createDebugRoutes(dbService, logsService, twitchService) {
     const router = express.Router();
-
-    router.get(`events/add`, (req, res)=>{
+    router.get("/events/add", (req, res)=>{
         dbService.addEvent({
             "subscription": {
-                "id": "f1c2a387-161a-49f9-a165-0f21d7a4e1c4",
+                "id": randomUUID(),
                 "type": "channel.update",
                 "version": "2",
                 "status": "enabled",
@@ -19,7 +42,7 @@ function createDebugRoutes(dbService, logsService, twitchService) {
                     "method": "webhook",
                     "callback": "https://example.com/webhooks/callback"
                 },
-                "created_at": "2023-06-29T17:20:33.860897266Z"
+                "created_at": (new Date()).toISOString()
             },
             "event": {
                 "broadcaster_user_id": "1337",
@@ -36,18 +59,11 @@ function createDebugRoutes(dbService, logsService, twitchService) {
         res.json({ success : true, message : "debug event added" });
     });
 
-    router.get(`events/all`, async(req, res)=>{
-        let events = await dbService.getAllEvents();
-        res.json({ success : true, events : events});
-    });
 
-    router.get(`auth/getUser`, async(req, res)=>{
+    router.get("/auth/getUser", async(req, res)=>{
         twitchService.getUserId().then((res)=>{
             
         });
-    });
-    router.get('events/subscribe', async(req, res)=>{
-        twitchService
     });
 
     return router;

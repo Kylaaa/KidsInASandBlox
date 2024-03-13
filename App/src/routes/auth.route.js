@@ -4,7 +4,7 @@
  *  name: Auth
  *  description: Endpoints to authenticate the Twitch session
  *
- * /login:
+ * /auth/login:
  *  get:
  *    summary: Shows a page to authenticate your account with Twitch.
  *    tags: [Auth]

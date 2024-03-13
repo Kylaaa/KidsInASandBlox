@@ -43,12 +43,21 @@ class dbService {
         return db;
     }
 
+    #convertEventDataToJSON(dataRows) {
+        for (let [i, dataObj] of Object.entries(dataRows)) {
+            dataRows[i]['data'] = JSON.parse(dataObj['data']);
+        }
+        return dataRows;
+    }
     
     addEvent(eventData) {
         // TODO : protect against replay attacks by only inserting events whose event id are unique
         return new Promise((resolve, reject)=>{
-            let insertQuery = "INSERT INTO events (data) VALUES (?)";
-            this.#db.run(insertQuery, JSON.stringify(eventData), (err)=>{
+            let id = eventData.subscription.id;
+            let name = eventData.subscription.type;
+            let receivedDate = eventData.subscription["created_at"];
+            let insertQuery = "INSERT OR IGNORE INTO events (id, name, data, received_date) VALUES (?,?, ?, ?)";
+            this.#db.run(insertQuery, [id, name, JSON.stringify(eventData.event), receivedDate], (err)=>{
                 if (err) {
                     let logger = this.#dependencies['logs'];
                     logger.error(`Threw an error while adding an event (${JSON.stringify(eventData)}) : `, err);
@@ -63,7 +72,7 @@ class dbService {
 
     getAllEvents() {
         return new Promise((resolve, reject) => {
-            let selectQuery = "SELECT data FROM events ORDER BY received_date ASC";
+            let selectQuery = "SELECT * FROM events ORDER BY received_date ASC";
             return this.#db.all(selectQuery, (err, rows)=>{
                 if (err) {
                     let logger = this.#dependencies['logs'];
@@ -71,10 +80,7 @@ class dbService {
                     reject(err);
                 }
                 else {
-                    let cleanedData = [];
-                    for (let [i, dataObj] of Object.entries(rows)) {
-                        cleanedData[i] = JSON.parse(dataObj['data']);
-                    }
+                    let cleanedData = this.#convertEventDataToJSON(rows);
                     resolve(cleanedData);
                 }
             });
@@ -85,7 +91,7 @@ class dbService {
         return new Promise((resolve, reject)=>{
             let startDateTime = new Date(start.toString()).toISOString();
             let endDateTime = new Date(end.toString()).toISOString();
-            let selectQuery = "SELECT data FROM events " +
+            let selectQuery = "SELECT * FROM events " +
                 "WHERE (received_date >= ?) AND (received_date <= ?) " +
                 "ORDER BY received_date ASC";
             return this.#db.all(selectQuery, startDateTime, endDateTime, (err, rows)=>{
@@ -95,7 +101,8 @@ class dbService {
                     reject(err);
                 }
                 else {
-                    resolve(rows);
+                    let cleanedData = this.#convertEventDataToJSON(rows);
+                    resolve(cleanedData);
                 }
             });
         });

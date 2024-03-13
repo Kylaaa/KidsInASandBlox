@@ -5,7 +5,8 @@
 
     "TABLE_SCHEMAS" : {
         "events": [
-            "id INTEGER PRIMARY KEY AUTOINCREMENT",
+            "id CHAR(36) PRIMARY KEY",
+            "name TEXT",
             "data TEXT",
             "received_date DATETIME DEFAULT CURRENT_TIMESTAMP"
         ],

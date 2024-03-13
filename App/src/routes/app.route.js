@@ -3,7 +3,7 @@
  * tags:
  *  name: App
  *  description: Endpoints regarding the state of the app
- * /status:
+ * /app/status:
  *  get:
  *    summary: Returns the status of your connection to Twitch.
  *    tags: [App]
@@ -20,7 +20,7 @@
  *                connected:
  *                  type: boolean
  *              
- * /connect:
+ * /app/connect:
  *  get:
  *    summary: Opens a window to authenticate with Twitch and connect to events
  *    tags: [App]

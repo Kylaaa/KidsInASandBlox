@@ -5,6 +5,23 @@
  *  description: Endpoints for accessing the events from Twitch.
  * components:
  *  schemas:
+ *    TwitchEvent:
+ *      type: object
+ *      properties:
+ *        id:
+ *          type: string
+ *          description: a unique identifier for this event, useful for de-duping across requests
+ *        name:
+ *          type: string
+ *          description: the subscription_type of the event, ex) 'channel.update'
+ *        data:
+ *          type: object
+ *          description: a JSON object containing all of the relevant information from this event
+ *        received_date:
+ *          type: string
+ *          format: date-time
+ *          description: the date-time that Twitch received the event
+ * 
  *    ListOfEvents:
  *      type: object
  *      properties:
@@ -13,7 +30,8 @@
  *          description: Whether the request succeeded.
  *        events:
  *          type: array
- *          items: JSON
+ *          items:
+ *            $ref: '#/components/schemas/TwitchEvent'
  *          description: The list of Twitch events received in chronological order.
  * 
  * /events/all:
@@ -27,6 +45,7 @@
  *          application/json:
  *            schema:
  *              $ref: '#/components/schemas/ListOfEvents'
+ * 
  * /events/between:
  *  get:
  *    summary: Gets all of the events received between the start and end dates
@@ -35,15 +54,19 @@
  *      - in: query
  *        name: start
  *        schema:
- *          type: Date
+ *          type: string
+ *          format: date-time
  *        required: true
  *        description: The starting datetime to fetch events between.
+ *        example: "2024-01-01T00:01:00Z"
  *      - in: query
  *        name: end
  *        schema:
- *          type: Date
+ *          type: string
+ *          format: date-time
  *        required: true
  *        description: The ending datetime to fetch events between.
+ *        example: "2024-12-31T23:59:59Z"
  *    responses:
  *      200:
  *        description: The list of events.
