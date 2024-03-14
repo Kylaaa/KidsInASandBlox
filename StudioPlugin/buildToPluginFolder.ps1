@@ -1,1 +1,0 @@
-rojo build --output "$env:LOCALAPPDATA\Roblox\Plugins\TwitchBloxPlugin.rbxm" "$PWD/default.project.json"
