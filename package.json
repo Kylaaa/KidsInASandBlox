@@ -13,7 +13,7 @@
     "websocket": "^1.0.34",
     "webview": "^1.1.0"
   },
-  "name": "kidsinasandblox",
+  "name": "twitchblox",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {

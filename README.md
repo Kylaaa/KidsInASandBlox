@@ -1,6 +1,6 @@
-<h1 align="center">KidsInASandBlox</h1>
+<h1 align="center">TwitchBlox Localhost Server</h1>
 <div align="center">
-	A Twitch integration that exposes events like donations, raids, shouts, and more to be accessible within Roblox experiences.
+	A Twitch integration that exposes events like donations, raids, shouts, and more to be accessible within client-sided Roblox experiences.
 </div>
 
 ## Table of Contents
@@ -64,14 +64,14 @@ Minimum Viable Product
 - [✔️] Library interface standardized
 - [✔️] Library connects to localhost server
 - [✔️] Localhost server Authenticates with Twitch
-- [In Progress] Localhost server observes cheers and donation events and stores the information
+- [✔️] Localhost server observes cheers and donation events and stores the information
 - [✔️] Localhost server API standardized
 - [❌] Roblox Studio Plugin logs observed events
 
 Expected Polish Before Release
 - [❌] Library configuration allows for custom Twitch rewards
 - [❌] Roblox Studio Plugin displays shouts and donations
-- [In Progress] Localhost server observes any supported event
+- [✔️] Localhost server observes any supported event
 
 Nice to Have
 - [❌] GitAction to package the localhost server into an executable.

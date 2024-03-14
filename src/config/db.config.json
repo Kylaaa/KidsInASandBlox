@@ -1,5 +1,5 @@
 {
-    "VERBOSE_DEBUGGING" : true,
+    "VERBOSE_DEBUGGING" : false,
     "PATH_TO_DB" : ":memory:",
     "DB_MODE" : "OPEN_READWRITE | OPEN_CREATE | OPEN_FULLMUTEX",
 

@@ -1,5 +1,5 @@
 {
-    "APP_NAME" : "Kids In A SandBlox",
+    "APP_NAME" : "TwitchBlox",
     "PUBLIC_PORT" : 3000,
     "VERSION" : "1.0.0",
     "CLIENT_ID" : "yj5phjmty3v747fr6lfnbzyzdptplw",
@@ -32,7 +32,7 @@
         },
         "contact" : {
             "name" : "Kyler Mulherin",
-            "url" : "https://itreallyiskyler.com",
+            "url" : "https://github.com/Kylaaa/TwitchBloxAppLocal",
             "email" : "kyler.mulherin@gmail.com"
         }
     }
